@@ -20,7 +20,7 @@ def sendLLM_request():
     response = requests.post(
         "https://api.ai21.com/studio/v1/j2-mid/complete",
         headers={
-            "Authorization": "Bearer 7X7mvKNPEJ4eXieVoFsTISA2p0yGumA2",
+            "Authorization": "Bearer <Dummy token>",
             "Content-Type": "application/json"
         },
         data=json.dumps({
