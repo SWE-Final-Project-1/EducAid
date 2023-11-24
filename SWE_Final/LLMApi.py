@@ -140,7 +140,11 @@ def send_segment_summarization_request():
         data = json.dumps(prompt)
     )
 
-    #TODO - How to present and handle responses
+    #TODO - How to handle the focus option - Will this be better or worse than normal summary
+    #TODO - Can 
+
+
+    
 
     # Process response
     response_data = response.json()
