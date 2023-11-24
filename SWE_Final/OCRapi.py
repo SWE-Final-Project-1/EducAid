@@ -81,8 +81,6 @@ location = "us"
 file_path = "C:/Users/Wepea Buntugu/Desktop/Calculus miscellaneous/Calculus assignment 2.pdf"
 processor_display_name = "Paper Test Digitizer"
 
-
-
 def quickstart(
         project_id: str, 
         location: str, 
