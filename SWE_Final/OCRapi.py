@@ -51,26 +51,25 @@ def upload_blob():
     
 
 
-# '''
-# Parameter will need to include student and test IDs
-# This will need to generate the ID of the scanned document using the parameters (in a way that keeps them identifiable)
-# Should store the image in the Firestore db with that generated ID
-# Should return stored ID and success code if applicable
-# '''
-# @app.route("/upload_scan", methods = ['POST'])
-# def upload_scan():
-#     metaData = json.loads(request.data)
-#     studentID = metaData["studentID"]
-#     testID = metaData["testID"]
-#     imageData = studentID + testID
+'''
+Upload text info to firestore database
+'''
+
+#TODO - Determine the text data that will be sent over to db and how
+@app.route("/student", methods = ['POST'])
+def upload_scan():
+    metaData = json.loads(request.data)
+    studentID = metaData["studentID"]
+    testID = metaData["testID"]
+    imageData = studentID + testID
 
 
     
-#     doc_ref = db.collection("users").document(imageData)
-#     doc_ref.set({"image"})
-#     doc_ref = db.collection("users").document("alovelace")
-#     doc_ref.set({"first": "Ada", "last": "Lovelace", "born": 1815})
-#     return jsonify("Success"), 200
+    doc_ref = db.collection("users").document(imageData)
+    doc_ref.set({"image"})
+    doc_ref = db.collection("users").document("alovelace")
+    doc_ref.set({"first": "Ada", "last": "Lovelace", "born": 1815})
+    return jsonify("Success"), 200
 
 
 app.run(debug = True)
@@ -81,6 +80,8 @@ location = "us"
 file_path = "C:/Users/Wepea Buntugu/Desktop/Calculus miscellaneous/Calculus assignment 2.pdf"
 processor_display_name = "Paper Test Digitizer"
 
+#TODO - Create api endpoint for this
+#TODO - Find out if files can be sent to API from cloud bucket
 def quickstart(
         project_id: str, 
         location: str, 
