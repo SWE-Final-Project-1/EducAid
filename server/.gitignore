@@ -1,1 +1,57 @@
-__pycache__
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+deactivate/
+
+# IDE-specific files
+.idea/
+.vscode/
+
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Compiled Python files
+*.pyc
+
+# macOS-specific
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Environment configuration
+.env
+
+# Python local package
+*.egg-info/
+dist/
+
+# Ignore local configuration files
+local_settings.py
+
+# Ignore secret keys
+secret_key.py
+
+# Ignore database configuration
+database_config.py
+
+# Ignore compiled files
+*.pyc
+*.pyo
+*.pyd
