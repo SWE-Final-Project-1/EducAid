@@ -2,34 +2,35 @@ export const CreateAssignmentPreview = () => {
   return (
     <div className="h-full px-4 py-2 space-y-2">
       <span className="text-sm opacity-40 font-semibold">
-        Students' Preview
+        Assignment Preview
       </span>
-      <div className="text-[1.8rem] mb-4">Physics Homework 2</div>
+      <div className="mb-4 font-logo">Physics Homework 2</div>
       <div className="flex items-start space-x-6">
         <span>
           {" "}
-          <span className="font-bold">Due: </span>18 Nov by 23:59
+          <span className="font-logo">Due: </span>18 Nov by 23:59
         </span>
 
         <span>
           {" "}
-          <span className="font-bold">Points: </span>20
+          <span className="font-logo">Points: </span>20
         </span>
 
         <span>
           {" "}
-          <span className="font-bold">Submitting: </span> PDF, PNG, JPG
+          <span className="font-logo">Submitting: </span> PDF, PNG, JPG
         </span>
 
         <span>
           {" "}
-          <span className="font-bold">Available: </span> 14 Nov at 0:00 - 19 Nov
+          <span className="font-logo">Available: </span> 14 Nov at 0:00 - 19 Nov
           at 23:59
         </span>
       </div>
       <div className="divider"></div>
 
       <div
+        className="font-logo font-light"
         dangerouslySetInnerHTML={{
           __html: `<div class="description user_content enhanced"><p><strong><span class="textLayer--absolute">Reflection Journal</span></strong></p>
 <p><span class="textLayer--absolute">Servant Leadership and NGOs</span></p>

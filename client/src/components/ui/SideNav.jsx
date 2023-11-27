@@ -1,6 +1,7 @@
 import { LogOut } from "lucide-react";
 import { Logo } from "./Logo";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const SideNav = ({ profile, tabIcons }) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -11,14 +12,15 @@ export const SideNav = ({ profile, tabIcons }) => {
       </div>
 
       <div className="flex flex-col items-start space-y-2 w-full">
-        {tabIcons?.map(({ icon, label }, index) => (
+        {tabIcons?.map(({ icon, label, route }, index) => (
           <TabButton
             key={index}
             icon={icon}
             index={index}
-            isActive={activeTab == index}
+            isActive={route == window.location.pathname}
             setActiveTab={setActiveTab}
             label={label}
+            route={route}
           />
         ))}
 
@@ -62,12 +64,21 @@ export const Profile = ({ profile }) => {
   );
 };
 
-export const TabButton = ({ icon, index, isActive, setActiveTab, label }) => {
+export const TabButton = ({
+  icon,
+  index,
+  isActive,
+  setActiveTab,
+  label,
+  route,
+}) => {
+  const navigate = useNavigate();
   return isActive ? (
     <div
       onClick={() => {
         setActiveTab(index);
         console.log(index);
+        navigate(route);
       }}
       className="w-full py-2 group-active:scale-90 transition-all duration-50 ease-in px-4 group flex items-center space-x-2 font-semibold bg-app_primary_hover border-r-2 border-app-blue cursor-pointer"
     >
@@ -79,6 +90,7 @@ export const TabButton = ({ icon, index, isActive, setActiveTab, label }) => {
       onClick={() => {
         setActiveTab(index);
         console.log(index);
+        navigate(route);
       }}
       className="w-full py-2 px-4 flex items-center group space-x-2 hover:bg-app-hover cursor-pointer"
     >

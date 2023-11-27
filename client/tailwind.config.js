@@ -1,15 +1,21 @@
 /** @type {import('tailwindcss').Config} */
 import daisyui from "daisyui";
+import flowbite from "flowbite/plugin";
 
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "node_modules/flowbite-react/lib/esm/**/*.js",
+  ],
   theme: {
     extend: {
       colors: {
         app_primary: "#143463",
-        app_primary_hover: "#1a437f", 
+        app_primary_hover: "#1a437f",
         app_secondary: "#53bab9",
-        app_white: "#fefefe" 
+        app_white: "#fefefe",
+        app_tertiary: "#7289DA",
       },
       fontFamily: {
         display: ["Lexand Deca", "Inter", "Roboto Mono"],
@@ -22,7 +28,7 @@ export default {
       },
     },
   },
-  plugins: [daisyui],
+  plugins: [daisyui, flowbite],
   daisyui: {
     themes: false, // true: all themes | false: only light + dark | array: specific themes like this ["light", "dark", "cupcake"]
     darkTheme: "dark", // name of one of the included themes for dark mode
