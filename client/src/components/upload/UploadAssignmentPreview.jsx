@@ -77,7 +77,7 @@ export const UploadAssignmentPreview = ({ file }) => {
     return (
       <div className="w-full h-full space-y-2 flex flex-col items-center justify-center">
         <img src="no-preview.png" className="w-60 h-60" />
-        <span className="opacity-50">No file Selected</span>
+        <span className="opacity-50">Let's get grading !</span>
       </div>
     );
   }

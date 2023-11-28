@@ -22,4 +22,8 @@ class Config:
     SQLALCHEMY_ECHO = os.environ.get("SQLALCHEMY_ECHO")
     CLIENT_URL = os.environ.get("CLIENT_URL")
     LLM_API_KEY = os.environ.get("LLM_API_KEY")
-
+    VISION_KEY = os.environ.get("VISION_KEY")
+    VISION_ENDPOINT = os.environ.get("VISION_ENDPOINT")
+    AZURE_STORAGE_CONNECTION_STRING = os.environ.get("AZURE_STORAGE_CONNECTION_STRING")
+    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+    CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
