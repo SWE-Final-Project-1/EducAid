@@ -1,10 +1,10 @@
-from config.config import Config
-import psycopg2
+from firebase_admin import credentials, firestore, initialize_app
+import os
 
-conn = psycopg2.connect(
-    host= Config.DB_HOST,
-    database=Config.DB_NAME,
-    user=Config.DB_USER,
-    password=Config.DB_PASSWORD
-)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(current_dir, "firebase_config.json")
 
+cred = credentials.Certificate(config_path)
+default_app = initialize_app(cred)
+
+db = firestore.client()

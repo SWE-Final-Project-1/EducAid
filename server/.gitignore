@@ -37,6 +37,7 @@ deactivate/
 
 # Environment configuration
 .env
+deativate
 
 # Python local package
 *.egg-info/
