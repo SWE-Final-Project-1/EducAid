@@ -9,6 +9,7 @@ from azure.cognitiveservices.vision.computervision.models import VisualFeatureTy
 from msrest.authentication import CognitiveServicesCredentials
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from firebase_admin import firestore
+from flask_cors import CORS
 from config.db import db
 import json
 import base64
@@ -64,6 +65,22 @@ def retrieve_assignments():
         return assignments_data, 200
 
     except Exception as e:
+        return {"error": str(e)}, 500
+
+
+@assignment.route("/<assignment_id>", methods=["GET"])
+def retrive_assignment_by_id(assignment_id):
+    try:
+        assignment_ref = db.collection("assignments").document(assignment_id)
+        assignment = assignment_ref.get()
+
+        if assignment.exists:
+            assignment_data = assignment.to_dict()
+            return assignment_data, 200
+        else:
+            return {"error": "Assignment not found"}, 404
+    except Exception as e:
+        print(e)
         return {"error": str(e)}, 500
 
 
@@ -139,7 +156,7 @@ def create_submission(assignment_id):
             "submissionURL": submission_url,
             "submissionDate": firestore.SERVER_TIMESTAMP,
         }
-        
+
         submissions_ref.add(submission_data)
 
         return {"message": "Submission created successfully"}, 201

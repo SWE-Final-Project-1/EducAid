@@ -1,15 +1,16 @@
 import { Bot, Upload } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
-import Select from "react-select";
+import AsyncSelect from "react-select/async";
 import { GridOverlay } from "../ui/GridOverlay";
 import { Logo } from "../ui/Logo";
 
 const SUPPORTED_FILE_TYPES = ["JPG", "PNG", "PDF"];
 export const UploadAssignment = ({ file, handleFileChange }) => {
-  useEffect(() => {
-    console.log(file);
-  });
+  const loadOptions = async (inputValue, callback) => {
+    const { data } = await api.get("/assignment/");
+    callback(data);
+  };
   return (
     <>
       <div className="w-full z-50 h-full flex flex-col space-y-6 justify-center items-center mx-auto px-10">
@@ -28,7 +29,7 @@ export const UploadAssignment = ({ file, handleFileChange }) => {
               The student the assignment belongs to
             </span>
           </div>
-          <Select className="w-full" />
+          <AsyncSelect className="w-full" />
         </div>
 
         <div className="w-full z-50">
@@ -38,7 +39,12 @@ export const UploadAssignment = ({ file, handleFileChange }) => {
               The assignment the student is submitting
             </span>
           </div>
-          <Select className="w-full" />
+          <AsyncSelect
+            cacheOptions
+            loadOptions={loadOptions}
+            defaultOptions
+            className="w-full"
+          />
         </div>
         <div className="w-full z-10">
           <span
@@ -65,5 +71,3 @@ export const UploadAssignment = ({ file, handleFileChange }) => {
     </>
   );
 };
-
-export const UploadArea = () => {};

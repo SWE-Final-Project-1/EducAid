@@ -9,6 +9,7 @@ from ws import socketio
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 CORS(
     app,
@@ -16,14 +17,17 @@ CORS(
     resources={
         r"/*": {
             "origins": "http://localhost:5173",
-        }
+        },
     },
 )
+
 
 socketio.init_app(
     app,
     cors_allowed_origins=[
+        "*",
         "http://localhost:5173",
+        "http://127.0.0.1:5173",
     ],
 )
 
@@ -33,10 +37,9 @@ def hello_world():
     return "<p>Welcome to EducAid API</p>"
 
 
+app.register_blueprint(assignment, url_prefix="/assignment")
 app.register_blueprint(auth, url_prefix="/auth")
 app.register_blueprint(grade, url_prefix="/grade")
-app.register_blueprint(assignment, url_prefix="/assignment")
 
 if __name__ == "__main__":
-    # app.run(debug=Config.DEBUG)
-    socketio.run(app, debug=Config.DEBUG)
+    socketio.run(app,debug=Config.DEBUG)
