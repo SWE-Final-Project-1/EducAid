@@ -1,15 +1,14 @@
-import { useState } from "react";
-import { Plus, Trash } from "lucide-react";
+import React, { useState } from "react";
 import { useCreatePreviewStore } from "../store/useCreatePreviewStore";
+import { Plus, Trash } from "lucide-react";
 
-export const RubricTable = () => {
-  const [criteria, setCriteria] = useState([
+export const OnboardTable = () => {
+  const [students, setStudents] = useState([
     {
-      name: "Introduction",
-      rating1: "",
-      rating2: "",
-      rating3: "",
-      points: "/ pts",
+      givenName: "",
+      surName: "",
+      age: "",
+      gender: "",
     },
   ]);
 
@@ -17,48 +16,43 @@ export const RubricTable = () => {
   const { rubricTableHtml, updateRubricTableHtml } = useCreatePreviewStore();
 
   const addCriteria = () => {
-    setCriteria([
-      ...criteria,
+    setStudents([
+      ...students,
       {
-        name: "New Criteria",
-        rating1: "",
-        rating2: "",
-        rating3: "",
-        points: "/ pts",
+        givenName: "",
+        surName: "",
+        age: "",
+        gender: "",
       },
     ]);
   };
 
   const removeCriteria = index => {
-    const updatedCriteria = [...criteria];
+    const updatedCriteria = [...students];
     updatedCriteria.splice(index, 1);
-    setCriteria(updatedCriteria);
+    setStudents(updatedCriteria);
   };
 
   const handleInputChange = (index, field, value) => {
-    const updatedCriteria = [...criteria];
+    const updatedCriteria = [...students];
     updatedCriteria[index][field] = value;
-    setCriteria(updatedCriteria);
+    setStudents(updatedCriteria);
   };
   const handleSaveRubric = () => {
     const tableHtmlString = generateTableHtml(); // Function to generate table HTML
     setTableHtml(tableHtmlString);
     updateRubricTableHtml(tableHtmlString);
     console.log(tableHtml);
-
-    // Now, you can send 'tableHtmlString' to your database or perform any other action
-    // to save it in the database.
   };
 
   const generateTableHtml = () => {
-    // Convert the criteria data to HTML string
-    const tableDataHtml = criteria.map(
+    // Convert the students data to HTML string
+    const tableDataHtml = students.map(
       c => `<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                 <td class="border px-1 text-center outline-none py-3">${c.name}</td>
-                 <td class="border px-1 text-center  outline-none py-3">${c.rating1}</td>
-                 <td class="border px-1 text-center  outline-none py-3">${c.rating2}</td>
-                 <td class="border px-1 text-center  outline-none py-3">${c.rating3}</td>
-                 <td class="border px-1 text-center  outline-none py-3">${c.points}</td>
+                 <td class="border px-1 text-center outline-none py-3">${c.givenName}</td>
+                 <td class="border px-1 text-center  outline-none py-3">${c.surName}</td>
+                 <td class="border px-1 text-center  outline-none py-3">${c.age}</td>
+                 <td class="border px-1 text-center  outline-none py-3">${c.gender}</td>
                </tr>`
     );
 
@@ -66,13 +60,16 @@ export const RubricTable = () => {
               <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" class=" py-3 px-2 text-center border">
-                    Criteria
+                    Given Name
                   </th>
-                  <th colspan="3" class=" py-3 text-center border">
-                    Rating
+                  <th  class=" py-3 text-center border">
+                    Sur Name
                   </th>
-                  <th colspan="1" class=" py-3 text-center border">
-                    Points
+                  <th  class=" py-3 text-center border">
+                    Age
+                  </th>
+                  <th class=" py-3 text-center border">
+                    Gender
                   </th>
                 </tr>
               </thead>
@@ -88,19 +85,16 @@ export const RubricTable = () => {
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className=" py-3 px-2 text-center border">
-                Criteria
+                GivenName
               </th>
-              <th colSpan={3} className=" py-3 text-center border">
-                Rating
-              </th>
-              <th colSpan={1} className=" py-3 text-center border">
-                Points
-              </th>
+              <th className=" py-3 text-center border">SurName</th>
+              <th className=" py-3 text-center border">Age</th>
+              <th className=" py-3 text-center border">Gender</th>
               <th className="py-3 text-center border">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {criteria.map((c, index) => (
+            {students.map((c, index) => (
               <tr
                 key={index}
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
@@ -110,45 +104,47 @@ export const RubricTable = () => {
                   className=" font-medium border text-gray-900 whitespace-nowrap dark:text-white"
                 >
                   <input
-                    value={c.name}
+                    value={c.givenName}
                     onChange={e =>
-                      handleInputChange(index, "name", e.target.value)
+                      handleInputChange(index, "givenName", e.target.value)
                     }
-                    className="bg-transparent px-1 border-none text-center outline-none py-3"
-                    placeholder="New Criteria"
+                    className="bg-transparent px-1 border-none text-center outline-none font-normal py-3"
+                    placeholder="Givenname"
                   />
                 </th>
                 <td className="border">
                   <input
-                    value={c.rating1}
+                    value={c.surName}
                     onChange={e =>
-                      handleInputChange(index, "rating1", e.target.value)
+                      handleInputChange(index, "surName", e.target.value)
                     }
-                    placeholder="Grade Explanation"
+                    placeholder="Surname"
                     className="bg-transparent px-1 text-center border-none outline-none py-3"
                   />
                 </td>
                 <td className="border">
                   <input
-                    value={c.rating2}
+                    value={c.age}
                     onChange={e =>
-                      handleInputChange(index, "rating2", e.target.value)
+                      handleInputChange(index, "age", e.target.value)
                     }
-                    placeholder="Grade Explanation"
+                    placeholder="Age"
+                    // pattern="[0-9]*"
+                    // inputmode="numeric"
                     className="bg-transparent px-1 border-none text-center outline-none py-3"
                   />
                 </td>
                 <td className="border">
                   <input
-                    value={c.rating3}
+                    value={c.gender}
                     onChange={e =>
-                      handleInputChange(index, "rating3", e.target.value)
+                      handleInputChange(index, "gender", e.target.value)
                     }
-                    placeholder="Grade Explanation"
+                    placeholder="Male or Female"
                     className="bg-transparent px-1 border-none text-center  outline-none py-3"
                   />
                 </td>
-                <td className="border">
+                {/* <td className="border">
                   <input
                     value={c.points}
                     onChange={e =>
@@ -157,7 +153,7 @@ export const RubricTable = () => {
                     placeholder="Points"
                     className="bg-transparent px-1 border-none text-center outline-none py-3"
                   />
-                </td>
+                </td> */}
                 <td className="px-6 border text-center">
                   <button
                     className="flex font-semibold border border-app_tertiary p-1 rounded-[0.4rem] bg-app_tertiary bg-opacity-10 text-app_tertiary items-center"
@@ -178,14 +174,14 @@ export const RubricTable = () => {
           onClick={addCriteria}
         >
           <Plus size={18} />
-          Criteria
+          Student
         </button>
         <form method="dialog">
           <button
             className="flex font-logo border border-app_tertiary px-3 py-2 rounded-[0.4rem] bg-app_tertiary bg-opacity-10 text-app_tertiary items-center"
             onClick={handleSaveRubric}
           >
-            Save Rubric
+            Enroll Students
           </button>
         </form>
       </div>

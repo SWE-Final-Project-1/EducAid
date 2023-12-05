@@ -41,7 +41,7 @@ export const CreateAssignmentPreview = () => {
           <span>
             {" "}
             <span className="font-logo">Submitting: </span>{" "}
-            {submissionFormats.map(format => format.label).join(", ")}
+            {submissionFormats.join(", ")}
           </span>
 
           <span>

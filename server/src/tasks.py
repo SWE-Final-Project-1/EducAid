@@ -7,6 +7,7 @@ from firebase_admin import firestore
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
 from msrest.authentication import CognitiveServicesCredentials
+import pandas as pd
 import os
 import time
 import ai21
@@ -33,7 +34,7 @@ def batch_grade(assignment_id):
         submissions_ref = db.collection("submissions").where(
             "assignmentId", "==", assignment_id
         )
-        
+
         submissions = submissions_ref.stream()
         print(submissions)
 
@@ -51,7 +52,7 @@ def batch_grade(assignment_id):
                 prompt=assignment_data.get("prompt"),
                 essay=essay_text,
             )
-            
+
             print(grading_result)
 
             update_submission(submission_id, grading_result)
@@ -59,6 +60,33 @@ def batch_grade(assignment_id):
         print("grading complete")
         # socketio.emit("grading_complete", {"assignmentId": assignment_id})
 
+    except Exception as e:
+        print(e)
+
+
+@celery.task()
+def batch_onboard(file_data, school, grade):
+    try:
+        df = pd.read_excel(file_data)
+        if not all(
+            field in df.columns for field in ["firstname", "lastname", "age", "gender"]
+        ):
+            print({"error": "Missing required fields in Excel file"})
+
+        collection_ref = db.collection("students")
+        for index, row in df.iterrows():
+            student_data = {
+                "firstName": row["firstname"],
+                "lastName": row["lastname"],
+                "age": row["age"],
+                "gender": row["gender"],
+                "school": school,
+                "grade": grade,
+            }
+            print(student_data)
+            collection_ref.add(student_data)
+
+        print("onboarding complete")
     except Exception as e:
         print(e)
 
