@@ -1,0 +1,238 @@
+{
+    "data": {
+        "text": "\nThe 12th President of the United States was Zachary Taylor. He served from 1849 until his death in 1850.",
+        "tokens": [
+            {
+                "generatedToken": {
+                    "logprob": -0.0008852138998918235,
+                    "raw_logprob": -0.007446154020726681,
+                    "token": "<|newline|>"
+                },
+                "textRange": {
+                    "end": 1,
+                    "start": 0
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.09109878540039062,
+                    "raw_logprob": -0.28411322832107544,
+                    "token": "▁The"
+                },
+                "textRange": {
+                    "end": 4,
+                    "start": 1
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -2.7418097943154862e-06,
+                    "raw_logprob": -0.00018416139937471598,
+                    "token": "▁"
+                },
+                "textRange": {
+                    "end": 5,
+                    "start": 4
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -9.179073458653875e-06,
+                    "raw_logprob": -0.0003240775258745998,
+                    "token": "12th"
+                },
+                "textRange": {
+                    "end": 9,
+                    "start": 5
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.012546890415251255,
+                    "raw_logprob": -0.06691475212574005,
+                    "token": "▁President▁of▁the▁United▁States"
+                },
+                "textRange": {
+                    "end": 40,
+                    "start": 9
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -3.480850500636734e-05,
+                    "raw_logprob": -0.0011075560469180346,
+                    "token": "▁was"
+                },
+                "textRange": {
+                    "end": 44,
+                    "start": 40
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.00012182447244413197,
+                    "raw_logprob": -0.0038095773197710514,
+                    "token": "▁Zachary"
+                },
+                "textRange": {
+                    "end": 52,
+                    "start": 44
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -1.311301275563892e-06,
+                    "raw_logprob": -9.512448741588742e-05,
+                    "token": "▁Taylor"
+                },
+                "textRange": {
+                    "end": 59,
+                    "start": 52
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.17578420042991638,
+                    "raw_logprob": -0.2999572157859802,
+                    "token": "."
+                },
+                "textRange": {
+                    "end": 60,
+                    "start": 59
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.046636469662189484,
+                    "raw_logprob": -0.14660759270191193,
+                    "token": "▁He▁served"
+                },
+                "textRange": {
+                    "end": 70,
+                    "start": 60
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.023864876478910446,
+                    "raw_logprob": -0.07978951185941696,
+                    "token": "▁from"
+                },
+                "textRange": {
+                    "end": 75,
+                    "start": 70
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -4.768370445162873e-07,
+                    "raw_logprob": -4.541770613286644e-05,
+                    "token": "▁"
+                },
+                "textRange": {
+                    "end": 76,
+                    "start": 75
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.5304644107818604,
+                    "raw_logprob": -0.576786994934082,
+                    "token": "1849"
+                },
+                "textRange": {
+                    "end": 80,
+                    "start": 76
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.5250822305679321,
+                    "raw_logprob": -0.5914130210876465,
+                    "token": "▁until▁his▁death"
+                },
+                "textRange": {
+                    "end": 96,
+                    "start": 80
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.0065691000781953335,
+                    "raw_logprob": -0.029415598139166832,
+                    "token": "▁in"
+                },
+                "textRange": {
+                    "end": 99,
+                    "start": 96
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -8.427741704508662e-05,
+                    "raw_logprob": -0.0014872215688228607,
+                    "token": "▁"
+                },
+                "textRange": {
+                    "end": 100,
+                    "start": 99
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -0.00028153270250186324,
+                    "raw_logprob": -0.0035399647895246744,
+                    "token": "1850"
+                },
+                "textRange": {
+                    "end": 104,
+                    "start": 100
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -9.464769391342998e-05,
+                    "raw_logprob": -0.002079706871882081,
+                    "token": "."
+                },
+                "textRange": {
+                    "end": 105,
+                    "start": 104
+                },
+                "topTokens": null
+            },
+            {
+                "generatedToken": {
+                    "logprob": -1.2484817504882812,
+                    "raw_logprob": -1.2000503540039062,
+                    "token": "<|endoftext|>"
+                },
+                "textRange": {
+                    "end": 105,
+                    "start": 105
+                },
+                "topTokens": null
+            }
+        ]
+    },
+    "finishReason": {
+        "reason": "endoftext"
+    }
+}

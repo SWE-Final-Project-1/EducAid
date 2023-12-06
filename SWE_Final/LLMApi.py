@@ -20,13 +20,13 @@ def send_general_request():
     response = requests.post(
         "https://api.ai21.com/studio/v1/j2-mid/complete",
         headers={
-            "Authorization": "Bearer <Dummy token>",
+            "Authorization": "Bearer 7X7mvKNPEJ4eXieVoFsTISA2p0yGumA2",
             "Content-Type": "application/json"
         },
         data=json.dumps({
             "prompt": prompt['prompt'],
             "numResults": 1,
-            "maxTokens": 30,
+            "maxTokens": 300,
             "temperature": 0.7,
             "topKReturn": 0,
             "topP":1,
@@ -74,6 +74,8 @@ def send_general_request():
     # Return response data to client
     return jsonify(response_data["completions"][0]["data"]["text"]), 200
 
+
+'''Grammar and error correction endpoint'''
 @app.route('/grammar_request', methods=['POST'])
 def send_grammar_request():
     prompt = json.loads(request.data)
@@ -99,6 +101,8 @@ def send_grammar_request():
     return jsonify(response_data), 200
 
 
+
+'''Text improvement endpoint'''
 @app.route("/improvement_request", methods = ["POST"])
 def send_improvement_request():
     prompt = json.loads(request.data)

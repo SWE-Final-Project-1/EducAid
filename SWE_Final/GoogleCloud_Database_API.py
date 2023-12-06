@@ -22,7 +22,7 @@ def index():
 
 
 
-
+'''This function creates a new upload in the image scans database/updates an existing one.'''
 @app.route("/image_scans", methods = ['POST'])
 def upload_blob():
     storage_client = storage.Client()
@@ -45,7 +45,7 @@ def upload_blob():
     blobsIter = bucket.list_blobs()
     for blob in blobsIter:
         print(blob.name)
-        if (blob.name == destination_blob_name):
+        if (blob.name == destination_blob_name): 
             if(toUpdate == "yes"):
                  blob = bucket.blob(destination_blob_name)
                  blob.upload_from_filename(source_file_name)
@@ -55,38 +55,18 @@ def upload_blob():
             return jsonify("Student test already uploaded"), 403
 
     
-        
-        
-    
     blob = bucket.blob(destination_blob_name)
 
     blob.upload_from_filename(source_file_name)
 
+    
     return jsonify(
         f"File {source_file_name} uploaded to {destination_blob_name}."
     ), 201
     
 
-
-'''
-Upload text info to firestore database
-'''
-
-#TODO - Determine the text data that will be sent over to db and how
-@app.route("/student", methods = ['POST'])
-def upload_scan():
-    metaData = json.loads(request.data)
-    studentID = metaData["studentID"]
-    testID = metaData["testID"]
-    imageData = studentID + testID
+# '''Function to download test text after it has been digitized by OCR API'''
+# @app.route("image_scans/digitized_test", methods = ["GET"])
 
 
-    
-    doc_ref = db.collection("users").document(imageData)
-    doc_ref.set({"image"})
-    doc_ref = db.collection("users").document("alovelace")
-    doc_ref.set({"first": "Ada", "last": "Lovelace", "born": 1815})
-    return jsonify("Success"), 200
-
-
-app.run(debug = True)
+app.run(debug=True)
