@@ -4,8 +4,56 @@ from werkzeug.datastructures import FileStorage
 import io
 from flask import Flask
 
+from google.api_core.client_options import ClientOptions
+from google.cloud import documentai 
+from flask import Flask, json, request, jsonify, Response
+from flask_cors import CORS
+import csv 
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import FileStorage
+import io
+import datetime
+import re
 
-'''Will receive a file object, returns csv content containing student IDs '''
+#Firestore imports
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+from google.cloud import storage
+import functions_framework
+
+'''Set project variables'''
+import os
+os.environ["GCLOUD_PROJECT"] = "educaid-406000"
+os.environ["GOOGLE_FUNCTION_SOURCE"] ="SWE_Final/main.py"
+# Use the application default credentials.
+cred = credentials.ApplicationDefault()
+
+#Firestore initialization
+firebase_admin.initialize_app(cred)
+db = firestore.client()
+
+app = Flask(__name__)
+
+#Enable CORS
+CORS(app)
+
+#General Document AI variables 
+project_id_value = "educaid-406000"
+location_value = "us"
+file_path = "SWE_Final/EducaidFiles/Literacy Test Marking Scheme detail.pdf"
+
+#Document OCR variables
+document_processor_display_name = "Test_Processor"
+document_processor_id_value = "8aec39517a59d1a3" # Create processor before running sample
+gcs_output_uri_value = "gs://digitized_test/" # Must end with a trailing slash `/`. Format: gs://bucket/directory/subdirectory/
+document_processor_version_id = "pretrained-ocr-v1.0-2020-09-23"
+
+#Form parser variables
+form_processor_display_name = "Form_parser"
+form_processor_id_value = "821f6f6b9cb17026" # Create processor before running sample
+gcs_output_uri_value = "gs://digitized_test/" # Must end with a trailing slash `/`. Format: gs://bucket/directory/subdirectory/
+form_processor_version_id_value = "pretrained-form-parser-v2.0-2022-11-10"
 
 
 def create_hash(school, student_class):
@@ -16,6 +64,7 @@ def create_hash(school, student_class):
     code = class_slice + school_slice
     return code
 
+'''Will receive a file object, returns csv content containing student IDs '''
 def edit_csv(file_object, school, student_class):
     codeGenerator = create_hash(school, student_class)
 
@@ -50,16 +99,79 @@ def edit_csv(file_object, school, student_class):
     return modified_student_data
     
 
+def digitize_submission(
+        project_id: str, 
+        location: str, 
+        file_object, 
+        processor_display_name: str,
+):
+    client = documentai.DocumentProcessorServiceClient()
+    
+  # The full resource name of the location, e.g.:
+    # `projects/{project_id}/locations/{location}`
+    parent = client.common_location_path(project_id, location)
 
-file_path = r"C:\Users\Wepea Buntugu\Desktop\Test_Student_Data.csv"
+    #Create in-memory file to allow for file handling without downloading
+    # with open(file_object):
+    image_content = file_object.read()
+    file_object.close()
+
+    # Load binary data
+    raw_document = documentai.RawDocument(
+        content=image_content,
+        mime_type="application/pdf",  # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
+    )
+
+    name = client.processor_version_path(
+            project= project_id_value,
+            location= location_value,
+            processor = document_processor_id_value ,
+            processor_version = document_processor_version_id
+        )
+
+    request = documentai.ProcessRequest(name= name, raw_document=raw_document )
+
+    result = client.process_document(request=request)
+
+    document = result.document
+
+    #Create local folder to store files
+    path = "./tests"
+    if not os.path.exists(path):
+        os.mkdir(path)
+    
+    file_path = path + '/' + "Page 1 Answers v2" + ".txt"
+
+    with open(file_path, 'w', encoding = 'utf-8') as fin:
+            fin.write(document.text)
+    
+    return document.text
+
+    # Read the text recognition output from the processor
+    # print("The document contains the following text:")
+    # print(document.text)
+
+    #Upon successful completion 
+
+def retrieveID(submission_text):
+    pattern = r"ID: ([A-Z0-9]+)"
+    match = re.search(pattern, submission_text)
+    if match:
+        return match.group(1)
+    else:
+        return False
+
+file_path = r"C:\Users\Wepea Buntugu\Downloads\Page 1 sample answer .pdf"
 
 file_storage_instance = FileStorage(
                         stream = open(file_path, 'rb'), 
-                        filename = 'StudentData', 
-                        content_type = 'text/csv'
+                        filename = 'IDFile', 
+                        content_type = 'application/pdf'
 )
-
-edit_csv(file_storage_instance, "Educaid Primary School", "4")
+# with open(r"tests\test23.txt", encoding = "utf-8") as fin:
+#     print(retrieveID(fin.read()))
+digitize_submission(project_id_value, location_value, file_storage_instance, form_processor_display_name)
+# edit_csv(file_storage_instance, "Educaid Primary School", "4")
 
 
 
@@ -123,9 +235,6 @@ def upload_class_info(school, student_class, student_names):
     
     # test_ref = single_classes_ref.document("tests")
     # test_ref.set({"testID": "TT1", "testResult": "45", "testDate":datetime.datetime(2023, 12, 9)})
-
-    
-
 #     schools_collection_ref.update({
 #    u'School_Name': firestore.ArrayUnion([u'Oklahoma Sooners', u'Miami Hurricanes', u'Colorado Bulldogs'])
 # })

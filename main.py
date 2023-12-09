@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 import io
 import datetime
+import re
 
 
 #Firestore imports
@@ -58,9 +59,8 @@ def index():
     Will be useful for question 5'''
 
 #TODO - Using placeholder student ID, need to generate ID based on studentName, class and others. Where in flow?
-@functions_framework.http
 @app.route('/document_ocr/test', methods = ['POST'])
-def test():
+def digitize_submission():
     metaData = json.loads(request.data)
     studentID = metaData["studentID"]
     testID = metaData["testID"]
@@ -68,7 +68,7 @@ def test():
 
     studentTestID = studentID + testID
 
-    if (process_document_ocr(project_id_value, location_value, imagePath, document_processor_display_name, studentTestID)):
+    if (process_document_ocr(project_id_value, location_value, imagePath, form_processor_display_name, studentTestID)):
         return jsonify("File successfully digitized"), 200
     else:
         return jsonify("Error encountered"), 500
@@ -84,15 +84,11 @@ def generate_student_ID():
     school = request.form['school']
     student_class = request.form['student_class']
 
-    file = request.files['file']
-
-
-    
     modified_student_data = ""
     filename = "Modified Student Data"
     
-    if 'file' not in request.files:
-        return jsonify("Student data file not found"), 400
+    # if 'file' not in request.files:
+    #     return jsonify("Student data file not found"), 400
 
     #Get file sent through POST request
     files = request.files.getlist('file')
@@ -109,8 +105,14 @@ def generate_student_ID():
     return response
 
 
-'''Create a test and upload its marking scheme'''
-@app.route("/tests", methods = ['POST'])
+
+'''Create a test and upload its marking scheme
+    Accept a test type(Literacy/Numeracy), a test date, marking scheme
+    Generate a test ID
+    Create a records in the db
+
+    Test - Test type, date, ID, marking scheme'''
+@app.route("/tests/upload", methods = ['POST'])
 def create_test():
     test_type = request.form['test_type']
     test_date = request.form.get('test_date', 'N/A')
@@ -122,22 +124,77 @@ def create_test():
         
     marking_scheme_file = request.files['marking_scheme']
 
-    in_file_object = io.StringIO(file)
-    marking_scheme_text = 
+    in_file_object = io.StringIO(marking_scheme_file.read().decode('utf-8'))
+    
+    marking_scheme_text = in_file_object.getvalue()
+    # return jsonify(marking_scheme_text)
 
-    digitized_marking_scheme = digitize_marking_scheme(file, )
+    if(upload_marking_scheme(marking_scheme_text, testID, test_type, test_date)):
+        return jsonify("Test successfully created"), 200
 
     
 
-    # return jsonify(test_type, test_date), 200
 
-
-
-'''Get all the tests and their information'''
-@app.route("/tests", methods = ['GET'])
+'''Get all the tests and their information
+Useful when attempting to display info to teacher for uploading student test files'''
+@app.route("/tests/retrieve", methods = ['GET'])
 def get_all_tests():
-    pass
+    all_tests = (
+    db.collection("Tests")
+    .stream()   
+    )
+
+    final_test = []
+
+
+    for test in all_tests:
+        full_test = test.to_dict()
+        del full_test["Marking_scheme"]
+        full_test["testID"] = test.id
+        final_test.append(full_test)
+    return jsonify(final_test), 200
     
+
+
+'''Allow for upload of multiple files under a particular test
+   Grade question 1 of the quiz, using matching algo and return score
+   Could reuse that same algo for question 2
+   Add results to firebase
+   Return results document HOW?? - (by classes)?? Priority will be a collective result doc, individual student/class not priority'''
+
+@app.route("/student_submission", methods = ["POST"])
+def submit_tests():
+    school = request.form["school"]
+    student_class = request.form["student_class"]
+    student_class = "Grade_"+ student_class
+    test_ID = request.form["test_ID"]
+    files = request.files.getlist('file[]')
+    IDs = []
+    # try:
+    for file in files:
+        digitized_submission = digitize_submission(project_id_value, location_value, file, form_processor_display_name)
+        studentID = retrieveID(digitized_submission)
+    #         '''Need another function to break down digitized submission into the different pages, 
+    #         list of different pages will be returned using "literacy" delimiter'''
+    #         part_one_grade = grade_part_one(part_one)
+    #         part_two_grade = grade_part_two(part_two)
+    #         part_three_grade = grade_part_three(part_three)
+    #         part_four_grade = grade_part_four(part_four)
+
+    #         total_grade = (part_four_grade +
+    #                     part_three_grade +
+    #                     part_two_grade + 
+    #                     part_one_grade)
+    #         '''Test timing for individual test grading and total batch of 5 and of 30'''
+    #         upload_grades(school, student_class, studentID, test_ID, total_grade)
+        
+    # except Exception as e:
+    #         return jsonify("Error occurred: ", e), 500
+
+    # return jsonify("All tests uploaded and graded successfully"), 200
+       
+
+
 
 
 
@@ -151,42 +208,78 @@ def get_all_tests():
 
 
 ######################################            HELPER FUNCTIONS     #########################################################
+'''Return grades in a file'''
+def return_grades():
+    pass
+
+
+'''Need to provide the school after selecting which test the student files 
+are going to be uploaded under'''
 def upload_grades(school, student_class, studentID, testID, grade):
     pass
 
-'''Accept a test type(Literacy/Numeracy), a test date, marking scheme
-    Generate a test ID
-    Create a records in the db
+'''Extracts student ID from submission file
+Returns false if the ID was not found'''
+def retrieveID(submission_text):
+    pattern = r"ID: ([A-Z0-9]+)"
+    match = re.search(pattern, submission_text)
+    if match:
+        return match.group(1)
+    else:
+        return False
 
-    Test - Test type, date, ID, marking scheme'''
-def create_test():
-    pass
-
-def digitize_marking_scheme(
-        paper_marking_scheme,
+'''Need to allow the function to take the image object that is read from the file passed through html
+Need to return the text file that is produced'''
+def digitize_submission(
         project_id: str, 
         location: str, 
-        file_path: str, 
+        file_object, 
         processor_display_name: str,
-        studentTestID: str):
-
-        pass
+):
+    client = documentai.DocumentProcessorServiceClient()
     
+  # The full resource name of the location, e.g.:
+    # `projects/{project_id}/locations/{location}`
+    parent = client.common_location_path(project_id, location)
+
+    #Create in-memory file to allow for file handling without downloading
+    # with open(file_object):
+    image_content = file_object.read()
+    file_object.close()
+
+    # Load binary data
+    raw_document = documentai.RawDocument(
+        content=image_content,
+        mime_type="application/pdf",  # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
+    )
+
+    name = client.processor_version_path(
+            project= project_id_value,
+            location= location_value,
+            processor = document_processor_id_value ,
+            processor_version = document_processor_version_id
+        )
+
+    request = documentai.ProcessRequest(name= name, raw_document=raw_document )
+
+    result = client.process_document(request=request)
+
+    document = result.document
+
+    return document.text
+
+
 
 '''Uploads marking scheme to the test firestore database along with the relevant information about the test'''
 def upload_marking_scheme(marking_scheme, testID, test_type, test_date):
-    test_collection_ref = db.collection("Test")
+    test_collection_ref = db.collection("Tests")
     single_test_ref = test_collection_ref.document(testID).set(
         {"Test_type":test_type,
         "Test_date":test_date, 
         "Marking_scheme":marking_scheme}
     )
+    return True
 
-
-'''Information about different collections that will be repeated as a subcollection will be provided as key:value pairs
-   in documents.
-   Eg. School - Location, headteacher
-       Class - Class teacher'''
 
 def upload_class_info(school, student_class, student_names):
     student_list = student_names.split("\n")
@@ -199,14 +292,16 @@ def upload_class_info(school, student_class, student_names):
 
     #Add school
     new_school_ref = schools_collection_ref.collection(school)
-    new_school_ref.document("School_Information").set({"Head Teacher": "N/A", "Location": "N/A"})
+    new_school_info_ref = new_school_ref.document("School_Information")
+    new_school_info_ref.set({"Head Teacher": "N/A", "Location": "N/A"})
     classes_ref = new_school_ref.document("Classes")
+    classes_ref.set({"Activity":"Active"})
 
     #Add class
     final_class = "Grade_" + student_class
     class_students_ref = classes_ref.collection(final_class).document("Students")
     class_students_ref.set({"Activity":"Active"})
-    class_information_ref = classes_ref.collection(final_class).document("Class Information")
+    class_information_ref = classes_ref.collection(final_class).document("Class_Information")
     class_information_ref.set({"Class_Teacher": "N/A", "Class_Prefect":"N/A"})
 
 
@@ -218,9 +313,9 @@ def upload_class_info(school, student_class, student_names):
         student_ID = details[2]
         students_ref = class_students_ref.collection(student_ID)
         student_info_ref = students_ref.document("Student_Information").set({"Name": student_name, "Gender": student_gender})
-        student_test_ref = students_ref.document("Tests").set({"TestId": [],
-                                                            "Test_Scores": []}
-            )
+        # student_test_ref = students_ref.document("Tests").set({"TestId": [],
+        #                                                     "Test_Scores": []}
+        #     )
 
     return True
 
@@ -256,7 +351,7 @@ def process_document_ocr(
             processor_version = document_processor_version_id
         )
 
-    request = documentai.ProcessRequest(name= name, raw_document=raw_document)
+    request = documentai.ProcessRequest(name= name, raw_document=raw_document )
 
     result = client.process_document(request=request)
 
