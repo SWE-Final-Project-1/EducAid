@@ -17,7 +17,6 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from google.cloud import storage
-import functions_framework
 
 '''Set project variables'''
 import os
@@ -52,7 +51,6 @@ form_processor_id_value = "821f6f6b9cb17026" # Create processor before running s
 gcs_output_uri_value = "gs://digitized_test/" # Must end with a trailing slash `/`. Format: gs://bucket/directory/subdirectory/
 form_processor_version_id_value = "pretrained-form-parser-v2.0-2022-11-10"
 
-@functions_framework.http
 @app.route('/', methods = ['GET'])
 def index():
     return "OCR endpoint"
