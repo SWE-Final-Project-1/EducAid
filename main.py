@@ -8,7 +8,6 @@ from werkzeug.datastructures import FileStorage
 import io
 import datetime
 import re
-import PyPDF2
 import requests
 
 
@@ -311,13 +310,13 @@ def retrieveID(submission_text):
     else:
         return False
 
-def get_first_page(student_file):
-    file_content = student_file.read()
-    file_like_object = io.BytesIO(file_content)
-    pdf_reader = PyPDF2.PdfReader(file_like_object)
-    first_page = pdf_reader.pages[0]
-    # file_like_object.close()
-    return first_page
+# def get_first_page(student_file):
+#     file_content = student_file.read()
+#     file_like_object = io.BytesIO(file_content)
+#     pdf_reader = PyPDF2.PdfReader(file_like_object)
+#     first_page = pdf_reader.pages[0]
+#     # file_like_object.close()
+#     return first_page
         
     
 
