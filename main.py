@@ -21,8 +21,9 @@ from google.cloud import storage
 import os
 os.environ["GCLOUD_PROJECT"] = "educaid-406000"
 os.environ["GOOGLE_FUNCTION_SOURCE"] ="SWE_Final/main.py"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "application_default_credentials.json"
 # Use the application default credentials.
-cred = credentials.ApplicationDefault("application_default_credentials.json")
+cred = credentials.ApplicationDefault()
 
 #Firestore initialization
 firebase_admin.initialize_app(cred)
