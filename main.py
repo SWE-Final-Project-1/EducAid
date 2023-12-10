@@ -8,6 +8,8 @@ from werkzeug.datastructures import FileStorage
 import io
 import datetime
 import re
+import PyPDF2
+import requests
 
 
 #Firestore imports
@@ -170,10 +172,26 @@ def submit_tests():
     test_ID = request.form["test_ID"]
     files = request.files.getlist('file[]')
     IDs = []
+    marking_scheme_answers = parse_marking_scheme(get_marking_scheme(test_ID))
+    new_dict = {}
+    new_dict["a"] = "b"
+    dummy_answer_list = ["a"]
+
     # try:
     for file in files:
-        digitized_submission = digitize_submission(project_id_value, location_value, file, form_processor_display_name)
-        studentID = retrieveID(digitized_submission)
+        # digitized_submission = digitize_submission(project_id_value, location_value, file, form_processor_display_name)
+        # studentID = retrieveID(digitized_submission)
+        # first_page = get_first_page(file)
+        # URL for the OCR API endpoint
+        answer_list = digitize_pages(file.read())
+        print(answer_list)
+        print(marking_scheme_answers)
+        grade = match_solution(answer_list, marking_scheme_answers)
+        IDs.append(grade)
+    return jsonify(IDs)
+        # IDs.append(answer_list)
+
+    '''Grade questions, add grades to database and return them in a file (by school), then deploy'''
     #         '''Need another function to break down digitized submission into the different pages, 
     #         list of different pages will be returned using "literacy" delimiter'''
     #         part_one_grade = grade_part_one(part_one)
@@ -206,17 +224,84 @@ def submit_tests():
 
 
 
-
 ######################################            HELPER FUNCTIONS     #########################################################
 '''Return grades in a file'''
 def return_grades():
     pass
 
 
+
+
+
 '''Need to provide the school after selecting which test the student files 
 are going to be uploaded under'''
 def upload_grades(school, student_class, studentID, testID, grade):
     pass
+
+def match_solution(student_answers, marking_scheme_answers):
+    start = "a"
+    result = 0
+    for student_answer in student_answers:
+        curr_marking_scheme_answer = marking_scheme_answers[start]
+        slash_index = curr_marking_scheme_answer.find("/")
+
+        if slash_index != -1:
+            scheme_answers = []
+            scheme_answers.append(curr_marking_scheme_answer[:slash_index])
+            scheme_answers.append(curr_marking_scheme_answer[slash_index +1:])
+            # print(scheme_answers)
+            if student_answer.casefold() == scheme_answers[0].casefold() or student_answer.casefold() == scheme_answers[1].casefold():
+                result += 1
+                print(student_answer, "+", curr_marking_scheme_answer)
+
+
+        else:
+            if curr_marking_scheme_answer.casefold().encode("utf-8") == student_answer.casefold().encode("utf-8"):
+                result += 1
+                print(student_answer, "+", curr_marking_scheme_answer, "-", result)
+
+        print(student_answer, "-", curr_marking_scheme_answer)
+        start = chr(ord(start) + 1)
+        if(start == 'u'):
+            break
+    return result
+
+
+def get_marking_scheme(test_ID):
+    doc_ref = db.collection("Tests").document(test_ID)
+
+    doc = doc_ref.get()
+
+    doc_dict = doc.to_dict()
+  
+    return doc_dict["Marking_scheme"]
+
+
+def parse_marking_scheme(text):
+    lines = re.split(r'\n|\t', text)
+
+    # Find the starting point of the scheme_answers
+    start_index = None
+    for i, line in enumerate(lines):
+        if line.startswith("a. ") or line.startswith("1. "):
+            start_index = i
+            break
+
+    # Check if the start index was found
+    if start_index is None:
+        return {}
+
+    # Parse the scheme_answers into a dictionary
+    scheme_answers = {}
+    for line in lines[start_index: start_index + 20]:
+        if line.strip():  # Check if the line is not empty
+            keyValue = line.split('. ')
+            key = keyValue[0]
+            value = keyValue[1]
+            scheme_answers[key.strip()] = value.strip()
+
+    return scheme_answers
+
 
 '''Extracts student ID from submission file
 Returns false if the ID was not found'''
@@ -228,45 +313,90 @@ def retrieveID(submission_text):
     else:
         return False
 
+def get_first_page(student_file):
+    file_content = student_file.read()
+    file_like_object = io.BytesIO(file_content)
+    pdf_reader = PyPDF2.PdfReader(file_like_object)
+    first_page = pdf_reader.pages[0]
+    # file_like_object.close()
+    return first_page
+        
+    
+
+def digitize_pages(file_object):
+    url = 'https://app.nanonets.com/api/v2/OCR/Model/15294711-5f6e-4bf3-ac48-79e6b0e74ce5/LabelFile/?async=false&lang=en'
+    api_key = '54f9c115-96de-11ee-91d1-e6e501c4925a'
+
+    
+    # Open the file in binary mode
+    image_content = file_object
+        # Prepare data to be sent in the request
+    data = {'file': ("placeholder", image_content, 'application/pdf')}  # Assuming the file is a PDF, update the content type as needed
+
+    # Send the request to the OCR API
+    response = requests.post(url, auth=requests.auth.HTTPBasicAuth(api_key, ''), files=data)
+
+    first_answer_list = []
+    second_answer_list = []
+    count_1 = 0
+    count_2 = 0
+    # first_answer_list.append(response.text)
+    first_table = json.loads(response.text)["result"][0]["prediction"][1]["cells"]
+    for cell in first_table:
+        if ((count_1 % 2) != 0):
+            first_answer_list.append(cell["text"])
+        count_1 += 1
+
+    second_table = json.loads(response.text)["result"][0]["prediction"][0]["cells"]
+    for cell in second_table:
+        if((count_2 % 2) != 0):
+            second_answer_list.append(cell["text"])
+        count_2 += 1
+    final_list = first_answer_list[1:] + second_answer_list
+
+    return final_list
+    # return first_answer_list
+    
+
 '''Need to allow the function to take the image object that is read from the file passed through html
 Need to return the text file that is produced'''
-def digitize_submission(
-        project_id: str, 
-        location: str, 
-        file_object, 
-        processor_display_name: str,
-):
-    client = documentai.DocumentProcessorServiceClient()
+# def digitize_submission(
+#         project_id: str, 
+#         location: str, 
+#         file_object, 
+#         processor_display_name: str,
+# ):
+#     client = documentai.DocumentProcessorServiceClient()
     
-  # The full resource name of the location, e.g.:
-    # `projects/{project_id}/locations/{location}`
-    parent = client.common_location_path(project_id, location)
+#   # The full resource name of the location, e.g.:
+#     # `projects/{project_id}/locations/{location}`
+#     parent = client.common_location_path(project_id, location)
 
-    #Create in-memory file to allow for file handling without downloading
-    # with open(file_object):
-    image_content = file_object.read()
-    file_object.close()
+#     #Create in-memory file to allow for file handling without downloading
+#     # with open(file_object):
+#     image_content = file_object.read()
+#     file_object.close()
 
-    # Load binary data
-    raw_document = documentai.RawDocument(
-        content=image_content,
-        mime_type="application/pdf",  # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
-    )
+#     # Load binary data
+#     raw_document = documentai.RawDocument(
+#         content=image_content,
+#         mime_type="application/pdf",  # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
+#     )
 
-    name = client.processor_version_path(
-            project= project_id_value,
-            location= location_value,
-            processor = document_processor_id_value ,
-            processor_version = document_processor_version_id
-        )
+#     name = client.processor_version_path(
+#             project= project_id_value,
+#             location= location_value,
+#             processor = document_processor_id_value ,
+#             processor_version = document_processor_version_id
+#         )
 
-    request = documentai.ProcessRequest(name= name, raw_document=raw_document )
+#     request = documentai.ProcessRequest(name= name, raw_document=raw_document )
 
-    result = client.process_document(request=request)
+#     result = client.process_document(request=request)
 
-    document = result.document
+#     document = result.document
 
-    return document.text
+#     return document.text
 
 
 
@@ -320,59 +450,6 @@ def upload_class_info(school, student_class, student_names):
     return True
 
 
-def process_document_ocr(
-        project_id: str, 
-        location: str, 
-        file_path: str, 
-        processor_display_name: str,
-        studentTestID: str
-
-):
-    client = documentai.DocumentProcessorServiceClient()
-    
-  # The full resource name of the location, e.g.:
-    # `projects/{project_id}/locations/{location}`
-    parent = client.common_location_path(project_id, location)
-
-    # Read the file into memory
-    with open(file_path, "rb") as image:
-        image_content = image.read()
-
-    # Load binary data
-    raw_document = documentai.RawDocument(
-        content=image_content,
-        mime_type="application/pdf",  # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
-    )
-
-    name = client.processor_version_path(
-            project= project_id_value,
-            location= location_value,
-            processor = document_processor_id_value ,
-            processor_version = document_processor_version_id
-        )
-
-    request = documentai.ProcessRequest(name= name, raw_document=raw_document )
-
-    result = client.process_document(request=request)
-
-    document = result.document
-
-    #Create local folder to store files
-    path = "./tests"
-    if not os.path.exists(path):
-        os.mkdir(path)
-    
-    file_path = path + '/' + studentTestID + ".txt"
-
-    with open(file_path, 'w', encoding = 'utf-8') as fin:
-            fin.write(document.text)
-
-    # Read the text recognition output from the processor
-    # print("The document contains the following text:")
-    # print(document.text)
-
-    #Upon successful completion 
-    return True
 
 
 def create_hash(school, student_class):

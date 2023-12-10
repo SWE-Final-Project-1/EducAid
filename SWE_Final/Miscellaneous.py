@@ -161,6 +161,66 @@ def retrieveID(submission_text):
     else:
         return False
 
+def parse_marking_scheme(text):
+    lines = re.split(r'\n|\t', text)
+
+    # Find the starting point of the mappings
+    start_index = None
+    for i, line in enumerate(lines):
+        print("hello", line)
+        if line.startswith("a. ") or line.startswith("1. "):
+            start_index = i
+            break
+
+    # Check if the start index was found
+    if start_index is None:
+        return {}
+
+    # Parse the mappings into a dictionary
+    mappings = {}
+    res_arr = []
+    for line in lines[start_index: start_index + 20]:
+        if line.strip():  # Check if the line is not empty
+            keyValue = line.split('. ')
+            print(keyValue)
+            key = keyValue[0]
+            value = keyValue[1]
+            res_arr.append(value.strip())
+            mappings[key.strip()] = value.strip()
+
+    return mappings, res_arr
+
+def match_solution(soln, mappings):
+    start = "a"
+    total = len(mappings)
+    result = 0
+    for val in soln:
+        curr_marking_scheme_answer = mappings[start]
+        slash_index = curr_marking_scheme_answer.find("/")
+        if slash_index != -1:
+            scheme_answers = []
+            scheme_answers.append(curr_marking_scheme_answer[:slash_index])
+            scheme_answers.append(curr_marking_scheme_answer[slash_index +1:])
+            # print(scheme_answers)
+            if val == scheme_answers[0] or val == scheme_answers[1]:
+                result += 1
+
+        else:
+            if curr_marking_scheme_answer == val:
+                result += 1
+        start = chr(ord(start) + 1)
+        if(start == 'u'):
+            break
+    return result
+
+with open(r"C:\Users\Wepea Buntugu\Desktop\V3_Test_Marking_Scheme.txt", encoding = "utf-8") as fin:
+    text = fin.read()
+    parsed, res_arr = parse_marking_scheme(text)
+    score = match_solution([  'B','D','P', 'F','M','N', 'R',
+    'G','U','C','H','L','T', 'Sh', 'Z','j','o','w','s',
+    'ch'], parsed)
+    print(parsed, res_arr, score)
+
 file_path = r"C:\Users\Wepea Buntugu\Downloads\Page 1 sample answer .pdf"
 
 file_storage_instance = FileStorage(
@@ -170,7 +230,7 @@ file_storage_instance = FileStorage(
 )
 # with open(r"tests\test23.txt", encoding = "utf-8") as fin:
 #     print(retrieveID(fin.read()))
-digitize_submission(project_id_value, location_value, file_storage_instance, form_processor_display_name)
+# digitize_submission(project_id_value, location_value, file_storage_instance, form_processor_display_name)
 # edit_csv(file_storage_instance, "Educaid Primary School", "4")
 
 
