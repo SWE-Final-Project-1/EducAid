@@ -26,7 +26,7 @@ export const Assignment = () => {
           <ContentScrollable
             nav1={<HeadNav title={"Assignments"} />}
             content={
-              <div className="w-full bg-slate-50 h-full">
+              <div className="w-full bg-app_white h-full">
                 <div
                   style={{ height: "calc(100vh - 4.2rem)" }}
                   className="w-full h-full px-5 py-3 overflow-y-auto"

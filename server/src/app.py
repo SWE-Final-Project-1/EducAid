@@ -4,6 +4,7 @@ from config.config import Config
 from controller.grade_controller import grade
 from controller.auth_controller import auth
 from controller.assignment_controller import assignment
+from controller.people_controller import people
 from ws import socketio
 
 
@@ -38,6 +39,7 @@ def hello_world():
 
 
 app.register_blueprint(assignment, url_prefix="/assignment")
+app.register_blueprint(people, url_prefix="/people")
 app.register_blueprint(auth, url_prefix="/auth")
 app.register_blueprint(grade, url_prefix="/grade")
 

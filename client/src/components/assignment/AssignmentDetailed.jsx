@@ -8,7 +8,7 @@ export const AssignmentDetailed = ({ assignment, isLoading }) => {
         <span className="text-sm opacity-40 font-semibold">
           Assignment Preview
         </span>
-        <div className="mb-4 font-logo">{assignment?.name}</div>
+        <div className="mb-4 font-logo text-[20px]">{assignment?.name}</div>
         <div className="flex items-start space-x-6">
           <span>
             {" "}
@@ -49,7 +49,7 @@ export const AssignmentDetailed = ({ assignment, isLoading }) => {
           }}
         ></div>
         <div
-          className="font-logo w-3/4 font-light"
+          className="font-logo w-full font-light"
           dangerouslySetInnerHTML={{ __html: assignment?.rubric }}
         ></div>
       </div>

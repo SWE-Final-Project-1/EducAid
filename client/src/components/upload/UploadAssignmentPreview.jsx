@@ -20,9 +20,9 @@ export const UploadAssignmentPreview = ({ file }) => {
   const renderImagePreview = () => {
     return (
       <div className="w-full h-full flex flex-col items-start">
-        <span className="text-sm opacity-40 font-semibold">Preview</span>
+        {/* <span className="text-sm opacity-40 font-semibold">Preview</span> */}
         <img
-          className="w-full rounded-[0.4rem] shadow-app_shadow"
+          className="w-full rounded-[0.4rem] border"
           src={URL.createObjectURL(file)}
           alt="Preview"
         />
@@ -32,10 +32,10 @@ export const UploadAssignmentPreview = ({ file }) => {
 
   const renderPdfPreview = () => {
     return (
-      <div>
-        <span className="text-sm opacity-40 font-semibold flex flex-col items-start">
+      <div className="space-y-2">
+        {/* <span className="text-sm opacity-40 font-logo flex flex-col items-start">
           Preview
-        </span>
+        </span> */}
         <Document
           file={URL.createObjectURL(file)}
           onLoadSuccess={onDocumentLoadSuccess}
@@ -76,8 +76,8 @@ export const UploadAssignmentPreview = ({ file }) => {
   if (!file) {
     return (
       <div className="w-full h-full space-y-2 flex flex-col items-center justify-center">
-        <img src="no-preview.png" className="w-60 h-60" />
-        <span className="opacity-50">Let's get grading !</span>
+        <img src="no-preview.png" className="w-40 h-40" />
+        <span className="opacity-40 font-logo text-[12px]">Let's get grading !</span>
       </div>
     );
   }

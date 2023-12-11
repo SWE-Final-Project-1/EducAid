@@ -1,3 +1,4 @@
+import { FolderSync } from "lucide-react";
 import { useCreatePreviewStore } from "../store/useCreatePreviewStore";
 import { IoFileTrayStackedSharp } from "react-icons/io5";
 
@@ -21,32 +22,32 @@ export const CreateAssignmentPreview = () => {
   return assignmentName || prompt ? (
     <>
       <div className="h-full px-4 py-2 space-y-2 transition-opacity duration-500 ease-linear">
-        <span className="text-sm opacity-40 font-semibold">
+        <span className="text-sm opacity-40 font-logo">
           Assignment Preview
         </span>
-        <div className="mb-4 font-logo">{assignmentName}</div>
+        <div className="mb-4 font-logo opacity-70 text-[23px]">{assignmentName}</div>
         <div className="flex items-start space-x-6">
-          <span>
+          <span className="text-[13px]">
             {" "}
-            <span className="font-logo">Due: </span>
+            <span className="font-logo text-[13px]">Due: </span>
             {dueDate.toDateString()}
           </span>
 
-          <span>
+          <span className="text-[13px]">
             {" "}
-            <span className="font-logo">Points: </span>
+            <span className="font-logo text-[13px]">Points: </span>
             {points}
           </span>
 
-          <span>
+          <span className="text-[13px]">
             {" "}
-            <span className="font-logo">Submitting: </span>{" "}
-            {submissionFormats.join(", ")}
+            <span className="font-logo text-[13px]">Submitting: </span>{" "}
+            {submissionFormats.length > 0 ? submissionFormats.join(", ") : "-"}
           </span>
 
-          <span>
+          <span className="text-[13px]">
             {" "}
-            <span className="font-logo">Available: </span>{" "}
+            <span className="font-logo text-[13px]">Test Type: </span>{" "}
             {`${new Date().toDateString()} - ${dueDate.toDateString()}`}{" "}
           </span>
         </div>
@@ -67,8 +68,8 @@ export const CreateAssignmentPreview = () => {
   ) : (
     <>
       <div className="w-full h-full flex flex-col space-y-2 items-center justify-center">
-        <IoFileTrayStackedSharp size={70} className="opacity-40" />
-        <span className="opacity-80 text-sm font-logo">Nothing to preview</span>
+        <FolderSync size={40} className="opacity-40" />
+        <span className="opacity-40 text-sm font-logo">Nothing to preview yet</span>
       </div>
     </>
   );
