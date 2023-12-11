@@ -1,5 +1,5 @@
-export const MetricsCard = () => {
-  return (
-    <div>MetricsCard</div>
-  )
-}
+export const MetricsCard = ({ color, icon, title, sub, value }) => {
+  return <div>
+
+  </div>;
+};

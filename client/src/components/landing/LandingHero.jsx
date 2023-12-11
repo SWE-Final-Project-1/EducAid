@@ -7,9 +7,9 @@ export const LandingHero = () => {
   const navigate = useNavigate();
   return (
     <div className="w-full flex flex-col items-center justify-center space-y-5 h-4/5">
-      <div className="text-[4.5rem] leading-[1.1] tracking-[-0.025em] font-[500] w-[800px] text-center">
+      <div className="text-[3.5rem] leading-[1.1] tracking-[-0.025em] font-[500] w-[700px] text-center">
         <span id="landing_annot" className="text-[#2463eb]">
-          Better Feedback
+          Better Productivity
         </span>{" "}
         With the Help of AI.
       </div>
@@ -20,7 +20,7 @@ export const LandingHero = () => {
       <div className="w-full flex items-center justify-center ">
         <Button
           onClick={() => navigate("/dashboard")}
-          className="rounded-full text-[13px] border"
+          className="arrow rounded-full text-white hover:text-white text-[13px] border"
         >
           Get Started Today - Free Forever
         </Button>

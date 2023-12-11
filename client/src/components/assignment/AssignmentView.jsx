@@ -1,5 +1,9 @@
 import { RotatingLines } from "react-loader-spinner";
 import { AssignmentCard } from "./AssignmentCard";
+import { Loader } from "../ui/Loader";
+import { Calendar, CalendarCheck, Info, ListTodo, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "../ui/ui/button";
 
 export const AssignmentView = ({ assignments, isLoading }) => {
   const dueAssignments = assignments?.filter(
@@ -8,7 +12,14 @@ export const AssignmentView = ({ assignments, isLoading }) => {
   const upcommingAssignments = assignments?.filter(
     ({ dueDate }) => new Date(dueDate) < Date.now()
   );
-  return (
+  const navigate = useNavigate();
+  return isLoading ? (
+    <>
+      <div className="w-full h-full flex items-center justify-center">
+        <Loader width={40} height={40} />
+      </div>
+    </>
+  ) : assignments.length > 0 ? (
     <div className="w-full mx-auto pt-5 space-y-4">
       <div className="flex flex-col">
         <span className="text-[15px] opacity-70 mb-3 font-logo">
@@ -66,5 +77,20 @@ export const AssignmentView = ({ assignments, isLoading }) => {
         </div>
       </div>
     </div>
+  ) : (
+    <>
+      <div className="w-full h-full flex-col flex space-y-3 items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <Button
+            onClick={() => navigate("/create")}
+            className="bg-app_tertiary space-x-2"
+          >
+            <Plus size={15} />
+            <span>Create New</span>
+          </Button>
+        </div>
+        <span className="opacity-70">No Assignments Created</span>
+      </div>
+    </>
   );
 };

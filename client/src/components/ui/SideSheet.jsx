@@ -7,20 +7,34 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 
-export const SideSheet = ({ heading, sub, content, children }) => {
+export const SideSheet = ({ heading, sub, content, children, open }) => {
   return (
     <>
-      <Sheet>
+      <Sheet defaultOpen={open}>
         <SheetTrigger className="flex items-center justify-center">
           {children}
         </SheetTrigger>
-        <SheetContent>
-          <SheetHeader className={"mb-4"}>
-            <SheetTitle className="text-[22px] border-b pb-2">{heading}</SheetTitle>
-            <SheetDescription>{sub}</SheetDescription>
-          </SheetHeader>
-          {content}
-        </SheetContent>
+        {open ? (
+          <SheetContent className="sm:max-w-[500px]">
+            <SheetHeader className={"mb-4"}>
+              <SheetTitle className="text-[22px] border-b pb-2">
+                {heading}
+              </SheetTitle>
+              <SheetDescription>{sub}</SheetDescription>
+            </SheetHeader>
+            {content}
+          </SheetContent>
+        ) : (
+          <SheetContent>
+            <SheetHeader className={"mb-4"}>
+              <SheetTitle className="text-[22px] border-b pb-2">
+                {heading}
+              </SheetTitle>
+              <SheetDescription>{sub}</SheetDescription>
+            </SheetHeader>
+            {content}
+          </SheetContent>
+        )}
       </Sheet>
     </>
   );

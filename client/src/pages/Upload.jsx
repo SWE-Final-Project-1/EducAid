@@ -20,6 +20,9 @@ import { Loader } from "../components/ui/Loader";
 import { INSTRUCTOR_TAB_ICONS } from "../constants";
 import { HeadNav } from "@/components/ui/HeadNav";
 import { useQuery } from "react-query";
+import { api } from "@/api";
+import { SideSheet } from "@/components/ui/SideSheet";
+import { StudentSheet } from "@/components/upload/StudentSheet";
 
 export const Upload = () => {
   const [sizes, setSizes] = useState([100, "10%", "auto"]);
@@ -36,27 +39,38 @@ export const Upload = () => {
     fileInputRef.current.click();
   };
 
-  // const handleFileChange = file => {
-  //   setFile(file);
-  // };
-
-  const { students, studentsLoading } = useQuery({
+  const { data: students, isLoading: studentsLoading } = useQuery({
     queryKey: ["students"],
-    queryFn: () => {
-      const { data } = api.get("/");
+    queryFn: async () => {
+      const { data } = await api.get("/people/");
       return data;
     },
   });
 
-  const { assignments, assignmentsLoading } = useQuery({
+  const { data: assignments, isLoading: assignmentsLoading } = useQuery({
     queryKey: ["assignments"],
-    queryFn: () => {
-      const { data } = api.get("/");
+    queryFn: async () => {
+      const { data } = await api.get("/assignment/");
       return data;
     },
   });
 
-  return (
+  console.log(assignments, students);
+  return studentsLoading || assignmentsLoading ? (
+    <AppLayout
+      sideNav={<SideNav tabIcons={INSTRUCTOR_TAB_ICONS} />}
+      mainArea={
+        <ContentScrollable
+          nav1={<HeadNav title={"Grading Area"} />}
+          content={
+            <div className="w-full flex items-center justify-center bg-white h-full">
+              <Loader width={40} height={40} />
+            </div>
+          }
+        />
+      }
+    />
+  ) : (
     <>
       <AppLayout
         sideNav={<SideNav tabIcons={INSTRUCTOR_TAB_ICONS} />}
@@ -69,6 +83,8 @@ export const Upload = () => {
                   <Pane minSize={"40%"} maxSize={"60%"} className="">
                     <div className="w-full h-full">
                       <UploadAssignment
+                        assignments={assignments}
+                        students={students}
                         file={memoizedFile}
                         handleButtonClick={handleButtonClick}
                         fileInputRef={fileInputRef}
@@ -90,7 +106,13 @@ export const Upload = () => {
           />
         }
       />
-      {/* <Loader msg={"Generating Feedback ..."} /> */}
+      <SideSheet
+        heading={"Select Student"}
+        content={<StudentSheet students={students} />}
+        open={true}
+      >
+        <></>
+      </SideSheet>
     </>
   );
 };

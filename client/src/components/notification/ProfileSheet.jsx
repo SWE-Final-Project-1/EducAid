@@ -13,7 +13,9 @@ export const ProfileSheet = () => {
           <div className="flex flex-col items-start">
             <span className="opacity-70 text-[15px] ">Name</span>
             <div className="w-full flex justify-between">
-              <span className="text-[15px]">Jonathan Kuug</span>
+              <span className="text-[15px]">
+                {user?.firstName + " " + user?.lastName}
+              </span>
               <span className="font-logo text-app_blue text-[15px] cursor-pointer">
                 Update
               </span>
@@ -26,7 +28,17 @@ export const ProfileSheet = () => {
               <Info size={15} />
             </span>
             <div className="w-full flex justify-between">
-              <span className="text-[15px]">kuugjonathan45@gmail.com</span>
+              <span className="text-[15px]">{user?.emailAddress}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-start">
+            <span className="opacity-70 text-[15px] space-x-2 flex items-center">
+              <span>Role</span>
+              <Info size={15} />
+            </span>
+            <div className="w-full flex justify-between">
+              <span className="text-[15px]">{user?.role}</span>
             </div>
           </div>
           <div className="flex flex-col items-start">
