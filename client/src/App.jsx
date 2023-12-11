@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import "./App.css";
@@ -19,33 +24,35 @@ import { Login } from "./pages/Login";
 import { Callback } from "./pages/Callback";
 import { Onboard } from "./pages/Onboard";
 import PrivateRoutes from "./components/auth/PrivateRoutes";
+import { Landing } from "./pages/Landing";
 
 function App() {
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
-        <WsProvider>
-          <Router>
-            <Routes>
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/auth/callback" element={<Callback />} />
-              <Route path="/auth/onboard" element={<Onboard />} />
-              <Route element={<PrivateRoutes />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/create" element={<Create />} />
-                <Route path="/upload" element={<Upload />} />
-                <Route path="/assignments" element={<Assignment />} />
-                <Route path="/assignments/:id" element={<AssignmentInfo />} />
-                <Route path="/people" element={<People />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/profile" element={<Profile />} />
-              </Route>
-              <Route path="*" element={<Navigate to="/dashboard" />} />
-            </Routes>
-          </Router>
-        </WsProvider>
+        {/* <WsProvider> */}
+        <Router>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth/callback" element={<Callback />} />
+            <Route path="/auth/onboard" element={<Onboard />} />
+            <Route element={<PrivateRoutes />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/create" element={<Create />} />
+              <Route path="/upload" element={<Upload />} />
+              <Route path="/assignments" element={<Assignment />} />
+              <Route path="/assignments/:id" element={<AssignmentInfo />} />
+              <Route path="/people" element={<People />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        </Router>
+        {/* </WsProvider> */}
       </UserProvider>
       <Toaster position="bottom-right" reverseOrder={false} />
       <ReactQueryDevtools initialIsOpen={false} />

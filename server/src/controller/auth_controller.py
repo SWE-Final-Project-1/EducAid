@@ -193,7 +193,9 @@ def onboard_student_data():
 
         print("here")
 
-        task = batch_onboard.delay(file_data.read(), school_name, grade)
+        task = batch_onboard.delay(
+            file_data.read(), school_name, grade, session["user"].get("id")
+        )
 
         app_user_ref = db.collection("app_users").document(instructor_id)
         doc = app_user_ref.get()
