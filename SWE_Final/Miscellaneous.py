@@ -295,9 +295,9 @@ def upload_class_info(school, student_class, student_names):
     
     # test_ref = single_classes_ref.document("tests")
     # test_ref.set({"testID": "TT1", "testResult": "45", "testDate":datetime.datetime(2023, 12, 9)})
-#     schools_collection_ref.update({
+# #     schools_collection_ref.update({
 #    u'School_Name': firestore.ArrayUnion([u'Oklahoma Sooners', u'Miami Hurricanes', u'Colorado Bulldogs'])
-# })
+# # })
 
 
 

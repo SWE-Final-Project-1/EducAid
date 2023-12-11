@@ -115,7 +115,10 @@ def generate_student_ID():
 def create_test():
     test_type = request.form['test_type']
     test_date = request.form.get('test_date', 'N/A')
-    testID = test_type[0:3] + test_date[2:4] + test_date[8:]
+    testID = (test_type[0:3] + 
+            test_date[2:4] + 
+            test_date[5:7] + 
+            test_date[8:] )
 
 
     if 'marking_scheme' not in request.files:
@@ -156,58 +159,44 @@ def get_all_tests():
 
 
 '''Allow for upload of multiple files under a particular test
-   Grade question 1 of the quiz, using matching algo and return score
-   Could reuse that same algo for question 2
-   Add results to firebase
-   Return results document HOW?? - (by classes)?? Priority will be a collective result doc, individual student/class not priority'''
-
+   Add results to firebase'''
 @app.route("/student_submission", methods = ["POST"])
 def submit_tests():
+    #Retrieve the single value variables from the request
     school = request.form["school"]
     student_class = request.form["student_class"]
     student_class = "Grade_"+ student_class
     test_ID = request.form["test_ID"]
+
+    #Retrieve the multi-value variables from the request
     files = request.files.getlist('file[]')
-    IDs = []
+    student_ID_list = request.form.getlist('studentID[]')
+
+    # grades = []
+    # grades.append(55)
+    # grades.append(00)
     marking_scheme_answers = parse_marking_scheme(get_marking_scheme(test_ID))
-    new_dict = {}
-    new_dict["a"] = "b"
-    dummy_answer_list = ["a"]
 
-    # try:
-    for file in files:
-        # digitized_submission = digitize_submission(project_id_value, location_value, file, form_processor_display_name)
-        # studentID = retrieveID(digitized_submission)
-        # first_page = get_first_page(file)
-        # URL for the OCR API endpoint
-        answer_list = digitize_pages(file.read())
-        print(answer_list)
-        print(marking_scheme_answers)
-        grade = match_solution(answer_list, marking_scheme_answers)
-        IDs.append(grade)
-    return jsonify(IDs)
-        # IDs.append(answer_list)
-
-    '''Grade questions, add grades to database and return them in a file (by school), then deploy'''
-    #         '''Need another function to break down digitized submission into the different pages, 
-    #         list of different pages will be returned using "literacy" delimiter'''
-    #         part_one_grade = grade_part_one(part_one)
-    #         part_two_grade = grade_part_two(part_two)
-    #         part_three_grade = grade_part_three(part_three)
-    #         part_four_grade = grade_part_four(part_four)
-
-    #         total_grade = (part_four_grade +
-    #                     part_three_grade +
-    #                     part_two_grade + 
-    #                     part_one_grade)
-    #         '''Test timing for individual test grading and total batch of 5 and of 30'''
-    #         upload_grades(school, student_class, studentID, test_ID, total_grade)
-        
-    # except Exception as e:
-    #         return jsonify("Error occurred: ", e), 500
-
-    # return jsonify("All tests uploaded and graded successfully"), 200
+    for studentID, file in zip(student_ID_list, files):
+        # answer_list = digitize_pages(file.read())
+        # # print(answer_list)
+        # # print(marking_scheme_answers)
+        # grade = match_solution(answer_list, marking_scheme_answers)
+        upload_grades(school, student_class, studentID, test_ID, 15)
+    return jsonify("All tests uploaded and graded successfully"), 200
        
+
+   
+'''Return results by school
+Return studentID, 
+studentName(can return ID and write separate function to return name by ID)
+testID (all the results for a single test before moving to next one)
+score
+in csv format
+'''
+@app.route("/results", methods = ["GET"])
+def return_grades():
+    pass
 
 
 
@@ -233,7 +222,22 @@ def return_grades():
 '''Need to provide the school after selecting which test the student files 
 are going to be uploaded under'''
 def upload_grades(school, student_class, studentID, testID, grade):
-    pass
+    school_ref = (
+    db.collection("Educaid")
+    .document("Schools")
+    .collection(school)
+    .document("Classes")
+    .collection(student_class)
+    .document("Students")
+    .collection(studentID)
+    .document("Tests")
+)
+
+    # Update the 'Test_ID' field
+    school_ref.update({'Test_ID': firestore.ArrayUnion([testID])})
+    school_ref.update({"Test_Score": firestore.ArrayUnion([grade])})
+
+
 
 def match_solution(student_answers, marking_scheme_answers):
     start = "a"
@@ -310,13 +314,6 @@ def retrieveID(submission_text):
     else:
         return False
 
-# def get_first_page(student_file):
-#     file_content = student_file.read()
-#     file_like_object = io.BytesIO(file_content)
-#     pdf_reader = PyPDF2.PdfReader(file_like_object)
-#     first_page = pdf_reader.pages[0]
-#     # file_like_object.close()
-#     return first_page
         
     
 
@@ -418,7 +415,7 @@ def upload_class_info(school, student_class, student_names):
 
 
     #Add school
-    new_school_ref = schools_collection_ref.collection(school)
+    new_school_ref = schools_collection_ref.collection(school.strip())
     new_school_info_ref = new_school_ref.document("School_Information")
     new_school_info_ref.set({"Head Teacher": "N/A", "Location": "N/A"})
     classes_ref = new_school_ref.document("Classes")
@@ -438,11 +435,12 @@ def upload_class_info(school, student_class, student_names):
         student_name = details[0]
         student_gender = details[1]
         student_ID = details[2]
-        students_ref = class_students_ref.collection(student_ID)
+        students_ref = class_students_ref.collection(student_ID.strip())
+        # print(student_ID)
         student_info_ref = students_ref.document("Student_Information").set({"Name": student_name, "Gender": student_gender})
-        # student_test_ref = students_ref.document("Tests").set({"TestId": [],
-        #                                                     "Test_Scores": []}
-        #     )
+        student_test_ref = students_ref.document("Tests").set({"Test_ID": [],
+                                                            "Test_Scores": []}
+            )
 
     return True
 
@@ -490,4 +488,4 @@ def edit_csv(file_object, school, student_class):
 
 
 
-app.run() 
+app.run(debug=True) 
