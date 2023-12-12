@@ -22,7 +22,7 @@ export const AssignmentCard = ({
 }) => {
   const navigate = useNavigate();
   return (
-    <div className="bg-app_white px-4 py-3 mb-4 rounded-[0.4rem] flex items-center justify-between border">
+    <div className="bg-slate-50 px-4 py-3 mb-4 rounded-[0.4rem] flex items-center justify-between border">
       <div className="flex items-center ">
         <div className="w-8 h-8 bg-slate-300 cursor-pointer rounded-full flex items-center justify-center mr-3">
           {type == "Literacy" ? (

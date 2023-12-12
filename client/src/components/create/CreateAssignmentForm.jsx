@@ -14,6 +14,7 @@ import { RotatingLines } from "react-loader-spinner";
 import toast from "react-hot-toast";
 import { ASSIGNMENT_FORMATS, ASSIGNMENT_TYPES } from "../../constants";
 import { AlertTriangle } from "lucide-react";
+import { Input } from "../ui/ui/input";
 
 export const CreateAssignmentForm = () => {
   // const [prompt, setPrompt] = useState();
@@ -72,28 +73,28 @@ export const CreateAssignmentForm = () => {
         style={{
           height: "calc(100vh - 3.5rem)",
         }}
-        className="h-full px-4 py-7 space-y-4 overflow-y-auto"
+        className="h-full px-4 space-y-4 overflow-y-auto"
       >
         <div className="w-full">
           <div className="flex flex-col items-start py-2">
-            <span className="font-logo">Name</span>
-            <span className="text-sm opacity-60">
-              What is the name of the assignment?
-            </span>
+            <span className="font-logo text-[15px] opacity-70">Name</span>
           </div>
-          <input
+          <Input
             value={assignmentName}
             onChange={e => updateAssignmentName(e.target.value)}
-            className="outline-none w-full text-[14px] py-2 px-2 rounded-[4px] border bg-app_white  ]"
+            className="outline-none w-full text-[14px] py-2 px-2 rounded-[4px] border bg-white"
             placeholder="Ex. Thermodynamics Assignment, Calculus Assignment"
           />
         </div>
 
         <div>
           <div className="w-full flex flex-col items-start py-2">
-            <span className="font-logo">Assignment Type</span>
-            <span className="text-sm opacity-60">
-              Is this a test of literacy or numeracy
+            <span className="font-logo text-[15px] opacity-70 flex items-center space-x-1">
+              <span>Type</span>
+              <Info size={12} />
+            </span>
+            <span className="opacity-60 text-[12px] space-x-1 flex items-center">
+              <div>Is this a test of literacy or numeracy</div>
             </span>
           </div>
           <Select
@@ -104,17 +105,19 @@ export const CreateAssignmentForm = () => {
         </div>
         <div className="w-full">
           <div className="flex flex-col items-start py-2">
-            <span className="font-logo">Prompt</span>
-            <span className="text-sm opacity-60">
-              Needs to be as detailed as possible for better grading results
+            <span className="font-logo opacity-70 flex items-center space-x-1">
+              <span>Prompt</span>
+              <Info size={12} />
+            </span>
+
+            <span className="opacity-60 text-[12px] space-x-1 flex items-center">
+              <div>
+                Needs to be as detailed as possible for better grading results
+              </div>
             </span>
           </div>
           <div>
             <MDEditor value={prompt} onChange={updatePrompt} />
-            {/* <MDEditor.Markdown
-            source={prompt}
-            style={{ whiteSpace: "pre-wrap" }}
-          /> */}
           </div>
         </div>
 
@@ -122,23 +125,26 @@ export const CreateAssignmentForm = () => {
           <div className="grid grid-cols-2 w-full gap-4">
             <div className="col-span-1">
               {/* <>
-              <div className="flex flex-col items-start py-2">
-                <span className="font-logo">Due Date</span>
-                <span className="text-sm opacity-60">
-                  Provide time when assignment is due
-                </span>
-              </div>
-
-              <DatePicker
-                className=""
-                value={dueDate}
-                onChange={setDueDate}
-              />
-            </> */}
+                <div className="flex flex-col items-start py-2">
+                  <span className="font-logo">Due Date</span>
+                  <span className="text-sm opacity-60">
+                    Provide time when assignment is due
+                  </span>
+                </div>
+                <Input
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  type="date"
+                  placeholder=""
+                  className="p-6"
+                />
+              </> */}
               <>
                 <div className="flex flex-col items-start py-2">
-                  <span className="font-logo">Submission Formats</span>
-                  <span className="text-sm opacity-60">
+                  <span className="font-logo text-[15px] opacity-70">
+                    Submission Formats
+                  </span>
+                  <span className="opacity-60 text-[12px]">
                     Select the formats allowed for submission
                   </span>
                 </div>
@@ -157,15 +163,17 @@ export const CreateAssignmentForm = () => {
             <div className="col-span-1 w-full ">
               <>
                 <div className="flex flex-col items-start py-2">
-                  <span className="font-logo">Points</span>
-                  <span className="text-sm opacity-60">
+                  <span className="font-logo opacity-70 text-[15px]">
+                    Points
+                  </span>
+                  <span className="opacity-60 text-[12px]">
                     How many points is this assignment worth?
                   </span>
                 </div>
 
-                <input
+                <Input
                   // type="number"
-                  className="w-full outline-none border text-[14px] py-2 px-2 rounded-[4px] bg-app_white number-to-text"
+                  className="w-full outline-none border text-[14px] py-2 px-2 rounded-[4px] bg-white number-to-text"
                   placeholder="Ex. 10pts, 20pts etc"
                   value={points}
                   onChange={e => updatePoints(e.target.value)}
@@ -179,10 +187,10 @@ export const CreateAssignmentForm = () => {
           {!rubricTableHtml ? (
             <span
               onClick={() => document.getElementById("my_modal_3").showModal()}
-              className=" shadow-app_shadow flex justify-center items-center text-sm text-white bg-app_tertiary px-3 py-2 rounded-[0.4rem] cursor-pointer w-full font-semibold"
+              className=" shadow-app_shadow flex justify-center items-center text-sm text-white bg-app_blue/70 px-3 py-2 rounded-[0.4rem] cursor-pointer w-full font-semibold"
             >
-              <div className="flex items-center">
-                <Upload className="mr-1" />
+              <div className="flex items-center space-x-2">
+                <Upload className="mr-1" size={20}/>
                 <span> Upload Rubric</span>
               </div>
             </span>

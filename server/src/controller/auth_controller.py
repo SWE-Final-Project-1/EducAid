@@ -72,7 +72,6 @@ def signup():
         password_hash = generate_password_hash(password, method="sha256")
         new_user_ref = app_user_ref.add(
             {
-                "id": existing_user.id,
                 "firstName": first_name,
                 "last_name": last_name,
                 "role": role,
@@ -85,6 +84,7 @@ def signup():
 
         # login_user(new_user_ref[1].get().to_dict())
         session["user"] = new_user_ref[1].get().to_dict()
+        session["user"]["id"] = new_user_ref[1].id
 
         return {
             "msg": "User successfully created",
@@ -193,7 +193,9 @@ def onboard_student_data():
 
         print("here")
 
-        task = batch_onboard.delay(file_data.read(), school_name, grade)
+        task = batch_onboard.delay(
+            file_data.read(), school_name, grade, session["user"].get("id")
+        )
 
         app_user_ref = db.collection("app_users").document(instructor_id)
         doc = app_user_ref.get()

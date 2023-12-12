@@ -34,18 +34,18 @@ export const Create = () => {
           <ContentScrollable
             nav1={<HeadNav title={"Create Assignment"} />}
             content={
-              <div className="w-full bg-slate-50 h-full">
-                <SplitPane split="vertical" sizes={sizes} onChange={setSizes}>
+              <div className="w-full bg-white h-full">
+                <SplitPane split="vertical" sizes={[550]} onChange={setSizes}>
                   <Pane
                     minSize={"35%"}
                     maxSize={"40%"}
-                    className="border border-r shadow-app_shadow_light"
+                    className=""
                   >
                     <div className="w-full h-full">
                       <CreateAssignmentForm />
                     </div>
                   </Pane>
-                  <Pane className="bg-slate-100">
+                  <Pane className="bg-app_slate">
                     <div className="w-full h-full">
                       <CreateAssignmentPreview />
                     </div>

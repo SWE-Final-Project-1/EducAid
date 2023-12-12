@@ -23,22 +23,18 @@ export const Dashboard = () => {
           <ContentScrollable
             nav1={<HeadNav title={"Dashboard"} />}
             content={
-              <div className="w-full bg-slate-100 h-full">
+              <div className="w-full bg-white h-full">
                 <SplitPane split="vertical" sizes={sizes} onChange={setSizes}>
-                  <Pane
-                    minSize={"70%"}
-                    maxSize={"60%"}
-                    className="border border-r shadow-app_shadow_light"
-                  >
+                  <Pane minSize={"70%"} maxSize={"60%"} className="">
                     <div className="w-full h-full">
-                      <button
+                      {/* <button
                         className="btn"
                         onClick={() =>
                           document.getElementById("my_modal_3").showModal()
                         }
                       >
                         open modal
-                      </button>
+                      </button> */}
 
                       <Dialog content={<RubricTable />} />
                       {/* <RubricTable/> */}

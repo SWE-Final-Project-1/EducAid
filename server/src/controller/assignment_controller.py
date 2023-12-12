@@ -54,9 +54,12 @@ def create_assignment():
 @assignment.route("/", methods=["GET"])
 def retrieve_assignments():
     try:
+        school_name = request.args.get("school")
         assignments_ref = db.collection("assignments")
 
-        assignments = assignments_ref.stream()
+        # Filter assignments based on the provided school name
+        query = assignments_ref.where("school", "==", school_name)
+        assignments = query.stream()
 
         assignments_data = [
             {"id": assignment.id, **assignment.to_dict()} for assignment in assignments
@@ -66,6 +69,19 @@ def retrieve_assignments():
 
     except Exception as e:
         return {"error": str(e)}, 500
+    # try:
+    #     assignments_ref = db.collection("assignments")
+
+    #     assignments = assignments_ref.stream()
+
+    #     assignments_data = [
+    #         {"id": assignment.id, **assignment.to_dict()} for assignment in assignments
+    #     ]
+
+    #     return assignments_data, 200
+
+    # except Exception as e:
+    #     return {"error": str(e)}, 500
 
 
 @assignment.route("/<assignment_id>", methods=["GET"])

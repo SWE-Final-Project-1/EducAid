@@ -65,7 +65,7 @@ def batch_grade(assignment_id):
 
 
 @celery.task()
-def batch_onboard(file_data, school, grade):
+def batch_onboard(file_data, school, grade, user_id):
     try:
         df = pd.read_excel(file_data)
         if not all(
@@ -74,6 +74,19 @@ def batch_onboard(file_data, school, grade):
             print({"error": "Missing required fields in Excel file"})
 
         collection_ref = db.collection("students")
+        notif_ref = db.collection("notifications")
+        result = notif_ref.add(
+            {
+                "userId": user_id,
+                "status": "pending",
+                "type": "onboarding",
+                "read": False,
+                "createdAt": firestore.SERVER_TIMESTAMP,
+            }
+        )
+
+        doc_ref = result[1]
+
         for index, row in df.iterrows():
             student_data = {
                 "firstName": row["firstname"],
@@ -86,6 +99,10 @@ def batch_onboard(file_data, school, grade):
             print(student_data)
             collection_ref.add(student_data)
 
+        doc_ref.update({
+            "status": "completed"
+        })
+        
         print("onboarding complete")
     except Exception as e:
         print(e)
