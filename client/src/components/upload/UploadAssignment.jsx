@@ -2,6 +2,7 @@ import {
   Bot,
   Info,
   Plus,
+  RotateCcw,
   ScreenShare,
   ScreenShareIcon,
   Upload,
@@ -12,6 +13,11 @@ import Select from "react-select";
 import { GridOverlay } from "../ui/GridOverlay";
 import { Logo } from "../ui/Logo";
 import { Button } from "../ui/ui/button";
+import { useUploadStore } from "../store/useUploadStore";
+import toast from "react-hot-toast";
+import { useMutation } from "react-query";
+import { RotatingLines } from "react-loader-spinner";
+import { api } from "@/api";
 
 const SUPPORTED_FILE_TYPES = ["JPG", "PNG", "PDF"];
 export const UploadAssignment = ({
@@ -22,14 +28,85 @@ export const UploadAssignment = ({
   assignments,
   students,
 }) => {
-  console.log(students, assignments);
+  const {
+    isOpen,
+    updateSelectedAssignment,
+    selectedAssignment,
+    selectedStudent,
+    updateIsOpen,
+  } = useUploadStore();
+
+  const submitMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await api.post("/submission/", {
+        assignment: selectedAssignment,
+        student: selectedStudent,
+        file: file,
+      });
+    },
+    onSuccess: data => {
+      toast("Submission Successfully Uploaded", {
+        icon: <Info />,
+      });
+    },
+
+    onError: data => {
+      toast("Error Uploading Submission", {
+        icon: <Info />,
+      });
+    },
+  });
+  const gradeNowMutation = useMutation({
+    mutationFn: async () => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("assignmentId", selectedAssignment);
+      formData.append("studentId", selectedStudent.id);
+      formData.append("fileExtension", file?.name.split(".").pop());
+      const { data } = await api.post("/grade/", formData);
+    },
+    onSuccess: data => {
+      toast("Submission Graded", {
+        icon: <Info />,
+      });
+    },
+    onError: data => {
+      toast("Error Grading Submission", {
+        icon: <Info />,
+      });
+    },
+  });
   return (
     <>
       <div className="w-full h-full flex flex-col space-y-6 mt-10 items-center mx-auto px-10">
         <div className="w-full flex items-center ">
           <div className="col-span-4 w-full bg-app_slate flex items-center justify-center">
             <div
+              style={{
+                opacity:
+                  !selectedAssignment ||
+                  submitMutation.isLoading ||
+                  gradeNowMutation.isLoading
+                    ? "80%"
+                    : "100%",
+                cursor:
+                  !selectedAssignment ||
+                  submitMutation.isLoading ||
+                  gradeNowMutation.isLoading
+                    ? "not-allowed"
+                    : "pointer",
+              }}
               onClick={() => {
+                if (
+                  !selectedAssignment ||
+                  submitMutation.isLoading ||
+                  gradeNowMutation.isLoading
+                ) {
+                  toast("Select an assignment first", {
+                    icon: <Info />,
+                  });
+                  return;
+                }
                 handleButtonClick();
               }}
               className="w-full h-auto py-5 bg-white rounded-xl border flex flex-col items-center justify-center border-app_tertiary border-dashed cursor-pointer"
@@ -51,8 +128,12 @@ export const UploadAssignment = ({
                 size={"sm"}
                 className="flex items-center bg-app_tertiary text-white "
               >
-                <Plus className="mr-3" size={15} />
-                Upload a file
+                {file ? (
+                  <RotateCcw className="mr-3" size={15} />
+                ) : (
+                  <Plus className="mr-3" size={15} />
+                )}
+                {file ? "Change file" : "Upload a file"}
               </Button>
             </div>
           </div>
@@ -66,6 +147,12 @@ export const UploadAssignment = ({
             </span>
           </div>
           <Select
+            isDisabled={selectedAssignment || selectedStudent ? true : false}
+            onChange={({ value, label }) => {
+              console.log(value);
+              updateIsOpen(true);
+              updateSelectedAssignment(value);
+            }}
             options={assignments?.map(({ name, type, id }) => ({
               value: id,
               label: name + " " + "(" + type + ")",
@@ -90,21 +177,60 @@ export const UploadAssignment = ({
           />
         </div> */}
         <div className="w-full 10">
-          <Button className=" shadow-app_shadow flex justify-center items-center text-sm text-white border bg-app_tertiary px-3 py-2 rounded-[0.4rem] cursor-pointer w-full font-semibold">
-            <div className="flex items-center space-x-2">
-              <Upload className="mr-1" size={"18px"} />
-              <span>Submit Assignment</span>
-            </div>
+          <Button
+            onClick={() => {
+              if (
+                !selectedAssignment ||
+                submitMutation.isLoading ||
+                gradeNowMutation.isLoading
+              ) {
+                toast("Select an assignment first", {
+                  icon: <Info />,
+                });
+                return;
+              }
+              submitMutation.mutate();
+            }}
+            className=" shadow-app_shadow flex justify-center items-center text-sm text-white border bg-app_tertiary px-3 py-2 rounded-[0.4rem] cursor-pointer w-full font-semibold"
+          >
+            {submitMutation.isLoading ? (
+              <>
+                <RotatingLines strokeColor="white" width="15" />
+              </>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Upload className="mr-1" size={"18px"} />
+                <span>Submit Assignment</span>
+              </div>
+            )}
           </Button>
           <div className="divider text-[12px] my-2">OR</div>
           <Button
-            onClick={() => document.getElementById("my_modal_1").showModal()}
+            onClick={() => {
+              if (
+                !selectedAssignment ||
+                submitMutation.isLoading ||
+                gradeNowMutation.isLoading
+              ) {
+                toast("Select an assignment first", {
+                  icon: <Info />,
+                });
+                return;
+              }
+              gradeNowMutation.mutate();
+            }}
             className="flex justify-center shadow-app_shadow items-center text-sm text-white border bg-app_secondary px-3 py-2 rounded-[0.4rem] cursor-pointer w-full font-semibold"
           >
-            <div className="flex items-center space-x-1">
-              <Bot className="mr-1" size={"19px"} />
-              <span>Grade Now</span>
-            </div>
+            {gradeNowMutation.isLoading ? (
+              <>
+                <RotatingLines strokeColor="white" width="15" />
+              </>
+            ) : (
+              <div className="flex items-center space-x-1">
+                <Bot className="mr-1" size={"19px"} />
+                <span>Grade Now</span>
+              </div>
+            )}
           </Button>
         </div>
         <div className="font-logo space-x-2 text-sm opacity-40 flex items-center">
