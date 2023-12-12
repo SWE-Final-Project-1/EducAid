@@ -23,6 +23,8 @@ import { useQuery } from "react-query";
 import { api } from "@/api";
 import { SideSheet } from "@/components/ui/SideSheet";
 import { StudentSheet } from "@/components/upload/StudentSheet";
+import { useUploadStore } from "@/components/store/useUploadStore";
+import { MiniStudentCard } from "@/components/upload/MiniStudentCard";
 
 export const Upload = () => {
   const [sizes, setSizes] = useState([100, "10%", "auto"]);
@@ -54,8 +56,8 @@ export const Upload = () => {
       return data;
     },
   });
+  const { isOpen } = useUploadStore();
 
-  console.log(assignments, students);
   return studentsLoading || assignmentsLoading ? (
     <AppLayout
       sideNav={<SideNav tabIcons={INSTRUCTOR_TAB_ICONS} />}
@@ -109,10 +111,11 @@ export const Upload = () => {
       <SideSheet
         heading={"Select Student"}
         content={<StudentSheet students={students} />}
-        open={true}
+        open={isOpen}
       >
         <></>
       </SideSheet>
+      <MiniStudentCard />
     </>
   );
 };
