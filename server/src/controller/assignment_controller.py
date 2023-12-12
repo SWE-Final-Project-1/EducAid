@@ -27,7 +27,6 @@ def create_assignment():
     try:
         req = json.loads(request.data)
         name = req.get("name")
-        # description = req.get("description")
         due_date = req.get("dueDate")
         rubric = req.get("rubric")
         type = req.get("type")
@@ -42,6 +41,7 @@ def create_assignment():
             "type": type,
             "prompt": prompt,
             "points": points,
+            "instructorId": session.get("user").get("id"),
         }
         assignments_ref.add(assignment_data)
 
@@ -54,11 +54,12 @@ def create_assignment():
 @assignment.route("/", methods=["GET"])
 def retrieve_assignments():
     try:
-        school_name = request.args.get("school")
+        # school_name = request.args.get("school")
+        instructor_id = session.get("user").get("id")
         assignments_ref = db.collection("assignments")
 
         # Filter assignments based on the provided school name
-        query = assignments_ref.where("school", "==", school_name)
+        query = assignments_ref.where("instructorId", "==", instructor_id)
         assignments = query.stream()
 
         assignments_data = [
