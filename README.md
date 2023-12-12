@@ -5,7 +5,7 @@
 ![Javascript](https://img.shields.io/badge/javascript-%23007ACC.svg?style=for-the-badge&logo=javascript&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/tailwindcss-hotpink.svg?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Flask](https://img.shields.io/badge/flask-%23E34F26.svg?style=for-the-badge&logo=flask&logoColor=white)
-![Firebase](https://img.shields.io/badge/firebase-%#0e6bd0.svg?style=for-the-badge&logo=firebase&logoColor=white)
+![Firebase](https://img.shields.io/badge/firebase-8A2BE2.svg?style=for-the-badge&logo=firebase&logoColor=white)
 
 
 <p align="center">
