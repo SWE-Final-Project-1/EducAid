@@ -12,7 +12,9 @@
   Better Productivity with the Help of AI✨.
 </p>
 
-
+<a href="https://aucampus-my.sharepoint.com/:w:/r/personal/buntugu_adamwaba_ashesi_edu_gh/_layouts/15/Doc.aspx?sourcedoc=%7B0C96CDBE-58E5-4E40-9B46-77C2DA3AB2C6%7D&file=Milestone%202.docx&action=default&mobileredirect=true&DefaultItemOpen=1&login_hint=jonathan.kuug%40ashesi.edu.gh&ct=1702420966840&wdOrigin=OFFICECOM-WEB.MAIN.REC&cid=88cede2b-f502-45a8-8de9-2c855505b5e2&wdPreviousSessionSrc=HarmonyWeb&wdPreviousSession=6964869a-cb71-41de-8933-26b923b9ccec">
+  Project Docs here 👈
+</a>
 <p align="center">
   <a href="#tech-stack"><strong>Tech Stack</strong></a>
 </p>
@@ -26,7 +28,7 @@
 - [Tailwind](https://tailwindcss.com/) – CSS
 - [Redis](https://upstash.com/) – redis
 - [Flask](https://flask.palletsprojects.com/en/3.0.x/) – server
-- [Firebase](https://firebase.google.com/) – server
+- [Firebase](https://firebase.google.com/) – database
 
 
 
