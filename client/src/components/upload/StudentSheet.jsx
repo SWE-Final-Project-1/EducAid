@@ -10,8 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/ui/table";
+import { useUploadStore } from "../store/useUploadStore";
 
 export const StudentSheet = ({ students }) => {
+  const { toggleIsOpen, isOpen, updateSelectedStudent } = useUploadStore();
   return (
     <Table>
       <TableCaption>A list of all enrolled students.</TableCaption>
@@ -31,7 +33,12 @@ export const StudentSheet = ({ students }) => {
         {students.map(s => (
           <TableRow key={s.id}>
             <TableCell>
-              <Checkbox />
+              <Checkbox
+                onCheckedChange={() => {
+                  toggleIsOpen();
+                  updateSelectedStudent(s);
+                }}
+              />
             </TableCell>
             <TableCell className="font-medium">{s.firstName}</TableCell>
             <TableCell>{s.lastName}</TableCell>

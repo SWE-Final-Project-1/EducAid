@@ -10,7 +10,7 @@ import {
 export const SideSheet = ({ heading, sub, content, children, open }) => {
   return (
     <>
-      <Sheet defaultOpen={open}>
+      <Sheet defaultOpen={open} open={open}>
         <SheetTrigger className="flex items-center justify-center">
           {children}
         </SheetTrigger>
