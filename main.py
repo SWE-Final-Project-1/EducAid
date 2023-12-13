@@ -171,20 +171,21 @@ def submit_tests():
     test_ID = request.form["test_ID"]
 
     #Retrieve the multi-value variables from the request
-    files = request.files.getlist('file[]')
+    files = request.files.getlist('files[]')
     student_ID_list = request.form.getlist('studentID[]')
-
-    # grades = []
-    # grades.append(55)
-    # grades.append(00)
     marking_scheme_answers = parse_marking_scheme(get_marking_scheme(test_ID))
 
+    # print(student_ID_list)
+    # print(len(files))
+
     for studentID, file in zip(student_ID_list, files):
-        # answer_list = digitize_pages(file.read())
-        # # print(answer_list)
-        # # print(marking_scheme_answers)
-        # grade = match_solution(answer_list, marking_scheme_answers)
-        upload_grades(school, student_class, studentID, test_ID, 15)
+        answer_list = digitize_pages(file.read())
+        print(answer_list)
+        grade = match_solution(answer_list, marking_scheme_answers)
+        print(grade)
+        print("/nStudentID = ", studentID)
+        upload_grades(school, student_class, studentID, test_ID, grade)
+
     return jsonify("All tests uploaded and graded successfully"), 200
        
 
@@ -200,6 +201,14 @@ in csv format
 def return_grades():
     pass
 
+
+'''Endpoint to retrieve all school information
+Function to retrieve all the test scores for a selected class and write them to a file:
+studentID, student Name, student gender, testid, testscore'''
+
+@app.route("/schools", methods = ["GET"])
+def get_all_schools():
+    pass
 
 
 
@@ -233,11 +242,28 @@ def upload_grades(school, student_class, studentID, testID, grade):
     .document("Students")
     .collection(studentID)
     .document("Tests")
-)
+    )
 
-    # Update the 'Test_ID' field
+    current_test_scores = (db.collection("Educaid")
+    .document("Schools")
+    .collection(school)
+    .document("Classes")
+    .collection(student_class)
+    .document("Students")
+    .collection(studentID)
+    .document("Tests").get()
+    )
+
+    score = current_test_scores
+    full_score = score.to_dict()["Test_Scores"]
+    new_score = full_score
+    new_score.append(grade)
+    print(new_score)
+
+
+    # Update the 'Test_ID' and 'Test_Scores' field
     school_ref.update({'Test_ID': firestore.ArrayUnion([testID])})
-    school_ref.update({"Test_Score": firestore.ArrayUnion([grade])})
+    school_ref.update({'Test_Scores': new_score})
 
 
 
@@ -255,15 +281,15 @@ def match_solution(student_answers, marking_scheme_answers):
             # print(scheme_answers)
             if student_answer.casefold() == scheme_answers[0].casefold() or student_answer.casefold() == scheme_answers[1].casefold():
                 result += 1
-                print(student_answer, "+", curr_marking_scheme_answer)
+                # print(student_answer, "+", curr_marking_scheme_answer)
 
 
         else:
             if curr_marking_scheme_answer.casefold().encode("utf-8") == student_answer.casefold().encode("utf-8"):
                 result += 1
-                print(student_answer, "+", curr_marking_scheme_answer, "-", result)
+                # print(student_answer, "+", curr_marking_scheme_answer, "-", result)
 
-        print(student_answer, "-", curr_marking_scheme_answer)
+        # print(student_answer, "-", curr_marking_scheme_answer)
         start = chr(ord(start) + 1)
         if(start == 'u'):
             break
@@ -353,47 +379,6 @@ def digitize_pages(file_object):
     return final_list
     # return first_answer_list
     
-
-'''Need to allow the function to take the image object that is read from the file passed through html
-Need to return the text file that is produced'''
-# def digitize_submission(
-#         project_id: str, 
-#         location: str, 
-#         file_object, 
-#         processor_display_name: str,
-# ):
-#     client = documentai.DocumentProcessorServiceClient()
-    
-#   # The full resource name of the location, e.g.:
-#     # `projects/{project_id}/locations/{location}`
-#     parent = client.common_location_path(project_id, location)
-
-#     #Create in-memory file to allow for file handling without downloading
-#     # with open(file_object):
-#     image_content = file_object.read()
-#     file_object.close()
-
-#     # Load binary data
-#     raw_document = documentai.RawDocument(
-#         content=image_content,
-#         mime_type="application/pdf",  # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
-#     )
-
-#     name = client.processor_version_path(
-#             project= project_id_value,
-#             location= location_value,
-#             processor = document_processor_id_value ,
-#             processor_version = document_processor_version_id
-#         )
-
-#     request = documentai.ProcessRequest(name= name, raw_document=raw_document )
-
-#     result = client.process_document(request=request)
-
-#     document = result.document
-
-#     return document.text
-
 
 
 '''Uploads marking scheme to the test firestore database along with the relevant information about the test'''
@@ -490,6 +475,51 @@ def edit_csv(file_object, school, student_class):
 
 
 
-# app.run(debug=True) 
-if __name__ == "__main__":
-   app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+app.run(debug=True) 
+# if __name__ == "__main__":
+#    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+
+
+
+
+'''Need to allow the function to take the image object that is read from the file passed through html
+Need to return the text file that is produced'''
+# def digitize_submission(
+#         project_id: str, 
+#         location: str, 
+#         file_object, 
+#         processor_display_name: str,
+# ):
+#     client = documentai.DocumentProcessorServiceClient()
+    
+#   # The full resource name of the location, e.g.:
+#     # `projects/{project_id}/locations/{location}`
+#     parent = client.common_location_path(project_id, location)
+
+#     #Create in-memory file to allow for file handling without downloading
+#     # with open(file_object):
+#     image_content = file_object.read()
+#     file_object.close()
+
+#     # Load binary data
+#     raw_document = documentai.RawDocument(
+#         content=image_content,
+#         mime_type="application/pdf",  # Refer to https://cloud.google.com/document-ai/docs/file-types for supported file types
+#     )
+
+#     name = client.processor_version_path(
+#             project= project_id_value,
+#             location= location_value,
+#             processor = document_processor_id_value ,
+#             processor_version = document_processor_version_id
+#         )
+
+#     request = documentai.ProcessRequest(name= name, raw_document=raw_document )
+
+#     result = client.process_document(request=request)
+
+#     document = result.document
+
+#     return document.text
+
+
