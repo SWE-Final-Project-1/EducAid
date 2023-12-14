@@ -54,7 +54,7 @@ form_processor_version_id_value = "pretrained-form-parser-v2.0-2022-11-10"
 
 @app.route('/', methods = ['GET'])
 def index():
-    return "OCR endpoint"
+    return "Educaid endpoint"
 
 '''Digitize a test using Document OCR. 
     Will be useful for question 5'''
@@ -93,6 +93,9 @@ def generate_student_ID():
 
     #Get file sent through POST request
     files = request.files.getlist('file')
+
+    #Store school name for later retrieval
+    store_school(school)
 
     for file in files: 
         modified_student_data = edit_csv(file, school, student_class)
@@ -180,26 +183,14 @@ def submit_tests():
 
     for studentID, file in zip(student_ID_list, files):
         answer_list = digitize_pages(file.read())
-        print(answer_list)
+        # print(answer_list)
         grade = match_solution(answer_list, marking_scheme_answers)
-        print(grade)
-        print("/nStudentID = ", studentID)
+        # print(grade)
+        # print("/nStudentID = ", studentID)
         upload_grades(school, student_class, studentID, test_ID, grade)
 
     return jsonify("All tests uploaded and graded successfully"), 200
        
-
-   
-'''Return results by school
-Return studentID, 
-studentName(can return ID and write separate function to return name by ID)
-testID (all the results for a single test before moving to next one)
-score
-in csv format
-'''
-@app.route("/results", methods = ["GET"])
-def return_grades():
-    pass
 
 
 '''Endpoint to retrieve all school information
@@ -208,24 +199,198 @@ studentID, student Name, student gender, testid, testscore'''
 
 @app.route("/schools", methods = ["GET"])
 def get_all_schools():
-    pass
+    all_schools = (db.collection("Schools")
+                    .stream())
+    schools_list = []
+
+    for school in all_schools:
+        schools_list.append(school.id)
+    return jsonify(schools_list)
 
 
+'''Return information about classes present in the chosen school
+param: school name'''
+@app.route("/classes", methods = ["GET"])
+def get_all_classes():
+    # request_data = json.loads(request.data)
+    school_name = request.args.get("school")
+    class_list = get_classes(school_name)
+    return jsonify(class_list)
 
 
+'''Return results by school
+Return studentID, 
+studentName(can return ID and write separate function to return name by ID)
+testID (all the results for a single test before moving to next one)
+score
+in csv format
+'''
+'''
+Write endpoint to retrieve grade
+    - Collect class and school name
+    - Access all students with query
+    - Access student information and test information (ID and scores) for each student
+    - Write to CSV
+
+'''
+@app.route("/results", methods = ["GET"])
+def return_grades():
+    class_name = request.args.get("class_name")
+    school_name = request.args.get("school_name")
+    student_info_results = get_student_info_results(school_name, class_name)
+    results_csv = write_results_to_file(student_info_results)
+    filename = school_name + "_" + class_name + "_Results"
+    # return jsonify(student_info_results)
 
 
-
+    response = Response(results_csv, content_type='text/csv')
+    response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+    return (response)
 
 
 
 
 
 ######################################            HELPER FUNCTIONS     #########################################################
-'''Return grades in a file'''
-def return_grades():
-    pass
 
+'''Return grades in a file'''
+def write_results_to_file(student_info):
+    table_headers = ["StudentID,Student Name,Gender,Test ID,Test Score"]
+    empty_file = ["No tests taken"]
+    out_file_object = io.StringIO()
+
+
+    if student_info == False:
+        csv_writer = csv.writer(out_file_object)
+        csv_writer.writerow(empty_file)
+        results_file = out_file_object.getvalue()
+        return results_file    
+
+    csv_writer = csv.writer(out_file_object)
+    csv_writer.writerow(table_headers)
+
+    for student, data in student_info.items():
+        studentID = student
+        student_name = data[0].get("Bio")[0]
+        student_gender = data[0].get("Bio")[1]
+
+        results = data[1].get("Results")
+        test_IDs = results[0]
+        test_scores = results[1]
+
+        for test_ID, test_score in zip(test_IDs, test_scores):
+            next_row = (studentID + "," +
+                        student_name + "," + 
+                        student_gender + "," + 
+                        str(test_ID) + "," + str(test_score)
+            )
+            csv_writer.writerow([next_row])
+
+    results_file = out_file_object.getvalue()
+    return results_file
+    
+
+'''Get student information in file'''
+def get_student_info_results(school_name, class_name):
+    student_ref = (db.collection("Educaid")
+                   .document("Schools")
+                   .collection(school_name)
+                   .document("Classes")
+                   .collection(class_name)
+                   .document("Students")
+                   .collections()
+    )
+
+    student_list = []
+    student_info = {}
+    
+    for student in student_ref:
+        student_bio_dict = {}
+        student_tests_dict = {}
+        combined_student_data = []
+        student_ID = student.id
+        # student_test_results = get_student_tests(school_name, class_name, student_id)
+        student_bio = get_student_bio(school_name, class_name, student_ID)
+        student_bio_dict["Bio"] = student_bio
+        combined_student_data.append(student_bio_dict)
+
+        student_tests = get_student_tests(school_name, class_name, student_ID)
+        if(len(student_tests[0])== 0):
+            return False
+
+        student_tests_dict["Results"] = student_tests
+        combined_student_data.append(student_tests_dict)
+
+        student_info[student_ID] = combined_student_data
+
+    return student_info
+
+
+
+'''Return the students test results
+Returns list with [test_IDs list, test_scores_list]'''
+def get_student_tests(school_name, class_name, student_id):
+    student_test_ref = (db.collection("Educaid")
+                   .document("Schools")
+                   .collection(school_name)
+                   .document("Classes")
+                   .collection(class_name)
+                   .document("Students")
+                   .collection(student_id)
+                   .document("Tests").get()
+    )
+    student_results = []
+    student_test_dict = student_test_ref.to_dict()
+    student_results.append(student_test_dict["Test_ID"])
+    student_results.append(student_test_dict["Test_Scores"])
+
+    return student_results
+
+
+
+
+
+'''Returns student bio information 
+Returns list [student_name, student gender]'''
+def get_student_bio(school_name, class_name, student_id):
+    student_info_ref = (db.collection("Educaid")
+                   .document("Schools")
+                   .collection(school_name)
+                   .document("Classes")
+                   .collection(class_name)
+                   .document("Students")
+                   .collection(student_id)
+                   .document("Student_Information").get()
+    )
+    student_bio = []
+    student_info_dict = student_info_ref.to_dict()
+    student_bio.append(student_info_dict["Name"])
+    student_bio.append(student_info_dict["Gender"])
+
+    return student_bio
+
+
+
+
+'''Returns all the classes associated with a particular school'''
+def get_classes(school_name):
+    classes_ref = (db.collection("Educaid")
+    .document("Schools")
+    .collection(school_name)
+    .document("Classes").collections()) #Allows subcollection access
+    
+
+    class_list = []
+    # print("Extracting classes")
+    for class_name in classes_ref:
+        class_list.append(class_name.id)
+    return class_list
+
+def store_school(school_name):
+    school_ref = (db.collection("Schools")
+    .document(school_name)
+    )
+    school_ref.set({"Activity":"Active"})
 
 
 
@@ -258,7 +423,7 @@ def upload_grades(school, student_class, studentID, testID, grade):
     full_score = score.to_dict()["Test_Scores"]
     new_score = full_score
     new_score.append(grade)
-    print(new_score)
+    # print(new_score)
 
 
     # Update the 'Test_ID' and 'Test_Scores' field
