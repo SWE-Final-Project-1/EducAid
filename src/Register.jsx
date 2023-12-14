@@ -1,12 +1,14 @@
-// Import axios at the top of your file
 import axios from 'axios';
-import React, { useState } from "react";
-
+import React, { useState } from 'react';
+import './App.css';
+import logo from './educaidphoto.png'
+// import { useNavigate } from "react-router-dom";
 
 
 
 export const Register = (props) => {
- 
+  // const history = useHistory(); 
+  // const navigate = useNavigate()
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [name, setName] = useState('');
@@ -14,8 +16,7 @@ export const Register = (props) => {
   const [address, setAddress] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
-
-
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,18 +42,14 @@ export const Register = (props) => {
     // Basic phone number verification
     const isValidPhoneNumber = (phoneNumber) => /^\d{10}$/.test(phoneNumber);
 
-// Example usage
-const phoneNumber = '1234567890';
-if (isValidPhoneNumber(phoneNumber)) {
-  // Proceed with registration or other actions
-} else {
-  // Display an error message
-  console.error('Please enter a valid 10-digit phone number');
-}
-
+    // Example usage
+    if (!isValidPhoneNumber(phoneNumber)) {
+      setError('Please enter a valid 10-digit phone number');
+      return;
+    }
 
     try {
-        const response = await axios.post('http://localhost:5001/register', {
+      const response = await axios.post('http://localhost:5001/register', {
         name,
         email,
         password: pass,
@@ -60,58 +57,67 @@ if (isValidPhoneNumber(phoneNumber)) {
         schoolName,
         address,
       });
-    
-  
-
 
       console.log('Registration successful:', response.data);
-      
+      setSuccessMessage('Registration successful!'); // Set success message
+      setError('');
 
-    
-     
-    }  catch (error) {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.error('Error registering user. Server responded with:', error.response.status);
-          console.error('Server response:', error.response.data);
-          setError('Registration failed. Please try again.');
-        } else if (error.request) {
-          // The request was made but no response was received
-          console.error('No response received from the server.');
-          setError('Registration failed. Please try again.');
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.error('Error setting up the request:', error.message);
-          setError('Registration failed. Please try again.');
-        }
-        
+      // You can also redirect the user to the login page or perform other actions
+      //  navigate("/login")
+    } catch (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error('Error registering user. Server responded with:', error.response.status);
+        console.error('Server response:', error.response.data);
+        setError('Registration failed. Please try again.');
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('No response received from the server.');
+        setError('Registration failed. Please try again.');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.error('Error setting up the request:', error.message);
+        setError('Registration failed. Please try again.');
       }
-      
+    }
+    setError('');
   };
 
   return (
     <div className="auth-form-container">
+      <img src = {logo} alt="Logo" className="logo" />
       <h1>EducAid</h1>
       <h2>Register</h2>
       <form className="register-form" onSubmit={handleSubmit}>
         <label htmlFor="name">Full name</label>
-        <input value={name} onChange={(e) => setName(e.target.value)} type="name" id="name" placeholder="full name" name='name' />
-        <label htmlFor="email">email</label>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="youremail@gmail.com" id="email" name="email" />
-        <label htmlFor="password">password</label>
+        <input value={name} onChange={(e) => setName(e.target.value)} type="name" id="name" placeholder="Enter your full name" name="name" />
+
+        <label htmlFor="email">Email</label>
+        <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Enter your email address" id="email" name="email" />
+
+        <label htmlFor="password">Password</label>
         <input value={pass} onChange={(e) => setPass(e.target.value)} type="password" placeholder="*******" id="password" name="password" />
+
         <label htmlFor="phoneNumber">Phone Number</label>
         <input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} type="tel" id="phoneNumber" placeholder="Phone Number" name="phoneNumber" />
-        <label htmlFor="schoolName"> What school do you teach? </label>
+
+        <label htmlFor="schoolName">What school do you teach?</label>
         <input value={schoolName} onChange={(e) => setSchoolName(e.target.value)} type="name" id="schoolName" placeholder="School Name" name="schoolName" />
-        <label htmlFor="address"> Home Address</label>
-        <input value={address} onChange={(e) => setAddress(e.target.value)} type="name" id="address" placeholder="address" name="address" />
+
+        <label htmlFor="address">Home Address</label>
+        <input value={address} onChange={(e) => setAddress(e.target.value)} type="name" id="address" placeholder="Address" name="address" />
+
         <button type="submit">Register</button>
       </form>
-      <span>Already have an account?</span><button className="link-btn" onClick={() => props.onFormSwitch('login')}>Log In Here </button>
+
+      {successMessage && <p style={{ color: 'green', textAlign: 'center' }}>{successMessage}</p>}
       {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+
+      <span>Already have an account?</span>
+      <button className="link-btn" onClick={() => props.onFormSwitch("login")}>Log In Here</button>
+
     </div>
   );
 };
-
+export default Register;
