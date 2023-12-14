@@ -39,19 +39,28 @@ class WebAppTest(unittest.TestCase):
         address_input = self.wait_for_element(By.ID, "address")
         register_button = self.wait_for_element(By.XPATH, "//button[text()='Register']")
 
-        name_input.send_keys("Musah Amidu")  # Typing the full name without numbers
+        name_input.send_keys("Musah Amidu")  
         email_input.send_keys("testname@gmail.com")
         password_input.send_keys("123456")
         phone_input.send_keys("0123456789")
         school_input.send_keys("Test High School")
         address_input.send_keys("123 Testing St")
+        
+        
+        
+        # name_input.send_keys("1234")  
+        # email_input.send_keys("testname")
+        # password_input.send_keys("12")
+        # phone_input.send_keys("phoneNumber")
+        # school_input.send_keys("Test High School")
+        # address_input.send_keys("123 Testing St")
+        
+        
 
         # Submit the registration form
         register_button.click()
 
-        # Check if registration was successful (you may need to adjust this)
-        # success_message = self.wait_for_element(By.XPATH, "//div[contains(text(), 'Registration successful')]", visibility=True, timeout=20)
-        # self.assertTrue(success_message.is_displayed(), "Registration was not successful.")
+        
         try:
             success_message = self.wait_for_element(By.XPATH, "//div[contains(text(), 'Registration successful')]", visibility=True, timeout=20)
             print("Success message found")

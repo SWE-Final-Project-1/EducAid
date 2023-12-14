@@ -2,13 +2,12 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import './App.css';
 import logo from './educaidphoto.png'
-// import { useNavigate } from "react-router-dom";
+
 
 
 
 export const Register = (props) => {
-  // const history = useHistory(); 
-  // const navigate = useNavigate()
+
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [name, setName] = useState('');
@@ -59,15 +58,13 @@ export const Register = (props) => {
       });
 
       console.log('Registration successful:', response.data);
-      setSuccessMessage('Registration successful!'); // Set success message
+      setSuccessMessage('Registration successful!'); 
       setError('');
 
-      // You can also redirect the user to the login page or perform other actions
-      //  navigate("/login")
+      
     } catch (error) {
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
+      
         console.error('Error registering user. Server responded with:', error.response.status);
         console.error('Server response:', error.response.data);
         setError('Registration failed. Please try again.');

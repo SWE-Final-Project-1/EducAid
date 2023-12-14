@@ -51,14 +51,18 @@ class WebAppTest(unittest.TestCase):
         login_button = self.wait_for_element(By.XPATH, "//button[contains(text(), 'Log In')]", visibility=True)
 
 
-        # Input values using JavaScript to bypass potential issues
         email_input.send_keys("testname@gmail.com")
         password_input.send_keys("123456")
+        
+        
+        
+        # email_input.send_keys("testname")
+        # password_input.send_keys("12")
 
         # Submit the login form
         login_button.click()
 
-        # Check if login was successful (you may need to adjust this)
+        # Check if login was successful 
         success_message = self.wait_for_element(By.XPATH, "//p[contains(text(), 'Login successful')]", visibility=True)
         self.assertTrue(success_message.is_displayed(), "Login was not successful.")
         

@@ -31,15 +31,15 @@ export const Login = (props) => {
     try {
       const response = await axios.post('http://localhost:5001/login', {
         email,
-        password: pass, // Send the password as 'password'
+        password: pass, 
       });
 
       console.log('Login successful:', response.data);
       setSuccessMessage('Login successful!'); // Set success message
       setError('');
 
-      // You can perform additional actions after successful login, if needed
-      // navigate('/register');
+      
+      
     } catch (error) {
       console.error('Error logging in:', error.response.data);
       setError('Login failed. Please check your credentials and try again.');

@@ -43,7 +43,7 @@ input {
   border: none;
   border-radius: 10px;
   width: 15rem;
-  min-width: 250px; /* Set a minimum width */
+  min-width: 250px; 
 }
 
 button {
