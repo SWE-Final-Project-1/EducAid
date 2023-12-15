@@ -15,7 +15,7 @@ import ai21
 
 ai21.api_key = Config.LLM_API_KEY
 celery = Celery(
-    "tasks", broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND
+    "tasks", broker=Config.CELERY_BROKER_URL, backend=Config.CELERY_RESULT_BACKEND,
 )
 
 
