@@ -3,7 +3,7 @@ import { Button } from "../ui/ui/button";
 import { Input } from "../ui/ui/input";
 import Select from "react-select";
 import toast from "react-hot-toast";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { api } from "@/api";
 import { useContext, useState } from "react";
 import { GENDERS } from "@/constants";
@@ -17,6 +17,7 @@ export const EnrollSheet = () => {
   const [gender, setGender] = useState("Male");
   const { user, userLoading } = useContext(userContext);
 
+  const queryClient = useQueryClient();
   const enrollMutation = useMutation({
     mutationFn: async () => {
       const { data } = await api.post("/people/", {
@@ -33,6 +34,7 @@ export const EnrollSheet = () => {
       toast(`${data?.firstName} Successfully Enrolled`, {
         icon: <Info />,
       });
+      queryClient.invalidateQueries(["students"]);
     },
     onError: err => {
       console.log(err);

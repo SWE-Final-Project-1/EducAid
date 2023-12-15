@@ -10,24 +10,11 @@ Your feedback should be as specific to the assignment as possible. Shy away from
 Give me your entire response in JSON format for easy processing. Again, If the context of the essay doesn't match what the prompt provided. Score the essay a zero and give feedback about how the student should follow the prompt next time.
 Response Format:
 {
-    "Breakdown": [
-        {
-            "Criteria": "Introduction"
-            "Level": "4",
-            "Feedback": "Student must..."
-            "Points": ""
-            
-        }, 
-        {
-            "Criteria" : "Situation Description",
-            "Level": "4",
-            "Feedback": "Student must..."
-            "points": ""
-            
-        }
-        ... for all criteria
-]
+    score: <out of the total points> (int),
+    grade: <letter grade based on the score> (str),
+    feedback: <feedback about the essay> (str), 
 }
+It should strictly be a json string
 
 Response should be formatted strictly as json based on the criteria above. DON'T RETURN RAW TEXT. Don't add any newline operators or slashes (\) to the json. it should be easily parsable. Don't add any other properties except those specified in the format above. 
 """

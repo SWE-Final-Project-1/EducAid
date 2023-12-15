@@ -4,6 +4,7 @@ from config.config import Config
 from config.db import db
 from constants.LLM_config import SYSTEM_INSTRUCTIONS, AI_ROLE, RUBRIC
 from firebase_admin import firestore
+from datetime import datetime
 
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
 from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
@@ -11,9 +12,9 @@ from azure.cognitiveservices.vision.computervision.models import VisualFeatureTy
 from msrest.authentication import CognitiveServicesCredentials
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 
+import time
 import os
 import json
-import time
 import base64
 import uuid
 
@@ -47,16 +48,13 @@ def auto_grade():
         blob_client = blob_service_client.get_blob_client(
             container="educaid", blob=f"{uuid.uuid4().hex}.{file_extension}"
         )
-        
-        
 
         blob_client.upload_blob(file.read())
-        
-        assignment_url = (
 
+        assignment_url = (
             f"https://educaidblob.blob.core.windows.net/educaid/{blob_client.blob_name}"
         )
-        
+
         print(assignment_url)
 
         essay = extract_text(assignment_url)
@@ -89,7 +87,7 @@ def auto_grade():
             prompt=_prompt,
             numResults=1,
             maxTokens=1500,
-            temperature=0.7,
+            temperature=0.1,
             topP=1,
         )
         print(response.completions[0].data.text)
@@ -103,15 +101,76 @@ def auto_grade():
         }
 
         submission_ref = db.collection("submissions").add(submission_data)
+
         grade_results_data = {
-            "submissionId": submission_ref.id,
+            "submissionId": submission_ref[1].id,
             "feedback": response.completions[0].data.text,
             "gradedAt": firestore.SERVER_TIMESTAMP,
             "instructorId": instructor_id,
         }
+
         grade_results_ref = db.collection("gradeResults").add(grade_results_data)
-        # response_dict = json.loads(response.completions[0].data.text)
-        return {"feedback": response.completions[0].data.text}, 200
+        return {
+            "submissionId": submission_ref[1].id,
+            "feedback": response.completions[0].data.text,
+            "gradedAt": datetime.now(),
+            "instructorId": instructor_id,
+        }, 200
+    except Exception as e:
+        print(e)
+        return {"error": str(e)}, 500
+
+
+
+@grade.route("/submissions/<assignment_id>", methods=["GET"])
+def retrieve_submissions_by_assignment(assignment_id):
+    try:
+        print(assignment_id)
+        submissions_ref = db.collection("submissions").where("assignmentId", "==", assignment_id)
+        submissions = []
+        for submission in submissions_ref.stream():
+            submissions.append(
+                {"id": submission.id, **submission.to_dict()}
+            )
+        print(submissions)
+        return submissions, 200
+    except Exception as e:
+        print(e)
+        return {"error": str(e)}, 500
+
+@grade.route("/submit", methods=["POST"])
+def submit_assignment():
+    try:
+        req = request.form
+
+        instructor_id = session.get("user").get("id")
+        file = request.files.get("file")
+        file_extension = req.get("fileExtension")
+        student_id = req.get("studentId")
+        assignment_id = req.get("assignmentId")
+
+        blob_client = blob_service_client.get_blob_client(
+            container="educaid", blob=f"{uuid.uuid4().hex}.{file_extension}"
+        )
+
+        blob_client.upload_blob(file.read())
+
+        assignment_url = (
+            f"https://educaidblob.blob.core.windows.net/educaid/{blob_client.blob_name}"
+        )
+    
+
+        submission_data = {
+            "assignmentId": assignment_id,
+            "studentId": student_id,
+            "submissionDate": firestore.SERVER_TIMESTAMP,
+            "submissionURL": assignment_url,
+            "instructorId": instructor_id,
+        }
+
+        submission_ref = db.collection("submissions").add(submission_data)
+
+        return {}, 200
     except Exception as e:
         print(e)
         return {"error": str(e)}, 500

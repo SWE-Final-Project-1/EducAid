@@ -8,10 +8,11 @@ import {
   MoreVertical,
   RefreshCcw,
 } from "lucide-react";
-import { useQuery } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { api } from "../../api";
 import { Menu } from "../ui/Menu";
 import { useNavigate } from "react-router-dom";
+import { RotatingLines } from "react-loader-spinner";
 
 export const AssignmentCard = ({
   id,
@@ -21,8 +22,22 @@ export const AssignmentCard = ({
   points,
 }) => {
   const navigate = useNavigate();
+  const batchMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await api.post(`/assignment/${id}/batch`, {
+        assignmentId: id,
+      });
+      return data;
+    },
+    onSuccess: data => {
+      console.log(data);
+    },
+    onError: err => {
+      console.log(err);
+    },
+  });
   return (
-    <div className="bg-slate-50 px-4 py-3 mb-4 rounded-[0.4rem] flex items-center justify-between border">
+    <div className="bg-white px-4 py-3 mb-4 rounded-[0.4rem] flex items-center justify-between border">
       <div className="flex items-center ">
         <div className="w-8 h-8 bg-slate-300 cursor-pointer rounded-full flex items-center justify-center mr-3">
           {type == "Literacy" ? (
@@ -50,9 +65,18 @@ export const AssignmentCard = ({
       </div>
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-4">
-          <div className="cursor-pointer font-logo  hover:bg-slate-100 p-2 rounded-[0.4rem] active:bg-slate-300">
-            <RefreshCcw size={16} className="opacity-50" />
-          </div>
+          {!batchMutation.isLoading ? (
+            <div
+              onClick={() => {
+                batchMutation.mutate();
+              }}
+              className="cursor-pointer font-logo  hover:bg-slate-100 p-2 rounded-[0.4rem] active:bg-slate-300"
+            >
+              <RefreshCcw size={16} />
+            </div>
+          ) : (
+            <RotatingLines strokeColor="black" width="15"  />
+          )}
           <div className="border font-logo font-light text-[10px] rounded-full px-2 py-0.5">
             UNGRADED
           </div>

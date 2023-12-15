@@ -1,8 +1,14 @@
 import { Info } from "lucide-react";
 import { useUploadStore } from "../store/useUploadStore";
+import { Button } from "../ui/ui/button";
 
 export const MiniStudentCard = () => {
-  const { selectedStudent } = useUploadStore();
+  const {
+    selectedStudent,
+    updateSelectedAssignment,
+    updateSelectedStudent,
+    updateIsOpen,
+  } = useUploadStore();
   return (
     selectedStudent && (
       <div className="fixed cursor-pointer flex items-center space-x-2 rounded-lg right-7 px-4 py-4 bottom-3 w-auto min-h-[50px] bg-white border">
@@ -18,6 +24,15 @@ export const MiniStudentCard = () => {
             All uploads will be associated with this student
           </span>
         </div>
+        <Button
+          onClick={() => {
+            updateSelectedAssignment(null);
+            updateSelectedStudent(null);
+          }}
+          variant={"outline"}
+        >
+          Undo
+        </Button>
       </div>
     )
   );
