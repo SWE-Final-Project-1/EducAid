@@ -57,6 +57,21 @@ export const CreateAssignmentForm = () => {
     },
   });
 
+  const literacyMutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await api.post("/assignment/", {
+       
+      });
+    },
+    onSuccess: data => {
+      toast.success("Assignment created !");
+    },
+
+    onError: data => {
+      toast.error("Error creating assignment");
+    },
+  })
+
   const isValidated =
     assignmentName &&
     assignmentType &&

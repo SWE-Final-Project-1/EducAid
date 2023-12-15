@@ -83,8 +83,8 @@ export const RubricTable = () => {
   };
   return (
     <>
-      <div className="relative overflow-x-auto pb-5">
-        <table className="w-1/2 text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 rounded-[0.4rem]">
+      <div className="w-full overflow-x-auto pb-5 px-5">
+        <table className="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 rounded-[0.4rem]">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className=" py-3 px-2 text-center border">
