@@ -584,9 +584,9 @@ def upload_class_info(school, student_class, student_names):
 #Add individual student information
     for row in student_list[1:]:
         details = row.split(",")
-        student_name = details[0]
-        student_gender = details[1]
-        student_ID = details[2]
+        student_name = details[0] + details[1]
+        student_gender = details[2]
+        student_ID = details[3]
         students_ref = class_students_ref.collection(student_ID.strip())
         # print(student_ID)
         student_info_ref = students_ref.document("Student_Information").set({"Name": student_name, "Gender": student_gender})
@@ -640,9 +640,9 @@ def edit_csv(file_object, school, student_class):
 
 
 
-# app.run(debug=True) 
-if __name__ == "__main__":
-   app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+app.run(debug=True) 
+# if __name__ == "__main__":
+#    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
 
 
 
