@@ -206,6 +206,17 @@ def get_submissions(assignment_id):
 def batch_grade_submissions(assignment_id):
     try:
         task = batch_grade.delay(assignment_id)
+        
+        notif_ref = db.collection("notifications")
+        result = notif_ref.add(
+            {
+                "userId": session.get("user").get("id"),
+                "status": "pending",
+                "type": "Batch grading",
+                "read": False,
+                "createdAt": firestore.SERVER_TIMESTAMP,
+            }
+        )
         return {"msg": "Batch grading started", "taskId": task.id}, 200
     except Exception as e:
         print(e)

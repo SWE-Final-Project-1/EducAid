@@ -110,6 +110,7 @@ export const UploadAssignment = ({
                     : "pointer",
               }}
               onClick={() => {
+                console.log(selectedAssignment);
                 if (
                   !selectedAssignment ||
                   submitMutation.isLoading ||
@@ -193,9 +194,10 @@ export const UploadAssignment = ({
         <div className="w-full 10">
           <Button
             onClick={() => {
+              console.log(selectedAssignment);
               if (
                 !selectedAssignment ||
-                !file ||
+                // !file ||
                 submitMutation.isLoading ||
                 gradeNowMutation.isLoading
               ) {
