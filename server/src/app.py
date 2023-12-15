@@ -8,7 +8,9 @@ from controller.people_controller import people
 from controller.notification_controller import notification
 from ws import socketio
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -23,16 +25,6 @@ CORS(
         },
     },
 )
-
-
-# socketio.init_app(
-#     app,
-#     cors_allowed_origins=[
-#         "*",
-#         "http://localhost:5173",
-#         "http://127.0.0.1:5173",
-#     ],
-# )
 
 
 @app.route("/")
