@@ -21,7 +21,7 @@ CORS(
     supports_credentials=True,
     resources={
         r"/*": {
-            "origins": "http://localhost:5173",
+            "origins": ["http://localhost:5173", "https://educai.vercel.app"],
         },
     },
 )
