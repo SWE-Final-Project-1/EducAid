@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
 app.secret_key = "super secret key"
 app.config["CORS_HEADERS"] = "Content-Type"
 
