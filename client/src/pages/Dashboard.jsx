@@ -48,7 +48,7 @@ export const Dashboard = () => {
   const { data: metrics, isLoading: metricsLoading } = useQuery({
     queryKey: ["metrics"],
     queryFn: async () => {
-      const { data } = await api.get("/people/metrics/");
+      const { data } = await api.get("/people/dashboard");
       return data;
     },
   });
@@ -80,27 +80,30 @@ export const Dashboard = () => {
                       color={"#f7a5a0"}
                       icon={<CheckCircle className="opacity-60" />}
                       title={"Assignments"}
-                      value={24}
+                      value={metrics?.total_assignments}
+                      sub={metrics?.percentage_increase_assignments}
                     />
                     <MetricsCard
                       color={"#c5ddf0"}
                       icon={<GraduationCap className="opacity-60" />}
                       title={"Enrolled Students"}
-                      value={24}
+                      value={metrics?.total_students}
+                      sub={metrics?.percentage_increase_students}
                     />
 
                     <MetricsCard
                       color={"#e7f0d2"}
                       icon={<Cpu className="opacity-60" />}
                       title={"Batch Grading"}
-                      //  sub ={}
-                      value={24}
+                      sub={metrics?.percentage_increase_notifications}
+                      value={metrics?.total_notifications}
                     />
                     <MetricsCard
                       color={"#f7ccb0"}
                       icon={<FileUp className="opacity-60" />}
                       title={"Submissions"}
-                      value={24}
+                      sub={metrics?.percentage_increase_submissions}
+                      value={metrics?.total_submissions}
                     />
                   </div>
                   <DashboardTable students={students} />

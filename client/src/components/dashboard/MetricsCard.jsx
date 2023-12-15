@@ -10,11 +10,11 @@ export const MetricsCard = ({ color, icon, title, sub, value }) => {
         </div>
         <div>
           <h1 className="text-[15px] font-logo opacity-80">{title}</h1>
-          <h1 className="text-[12px] opacity-70">{sub}</h1>
+          {/* <h1 className="text-[12px] opacity-70">{sub}</h1> */}
         </div>
         <div>
-          <h1 className="text-[18px] font-medium">{value}</h1>
-          <span className="text-[12px]">+9%</span>
+          <h1 className="text-[18px] font-medium">{value ? value : "-"} </h1>
+          <span className="text-[12px]">{sub ? sub : "-"}%</span>
         </div>
       </div>
     </div>
