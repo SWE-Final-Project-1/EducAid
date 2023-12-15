@@ -25,14 +25,16 @@ import { SideSheet } from "@/components/ui/SideSheet";
 import { StudentSheet } from "@/components/upload/StudentSheet";
 import { useUploadStore } from "@/components/store/useUploadStore";
 import { MiniStudentCard } from "@/components/upload/MiniStudentCard";
+import { FeedbackSheet } from "@/components/upload/FeedbackSheet";
 
 export const Upload = () => {
   const [sizes, setSizes] = useState([100, "10%", "auto"]);
   const [file, setFile] = useState(null);
   const memoizedFile = useMemo(() => file, [file]);
   const fileInputRef = useRef();
-
+  const { isOpen, feedbackOpen, updateFeedbackOpen, selectedAssignment } = useUploadStore();
   const handleFileChange = async event => {
+
     const file = event.target.files[0];
     setFile(file);
   };
@@ -56,7 +58,16 @@ export const Upload = () => {
       return data;
     },
   });
-  const { isOpen } = useUploadStore();
+
+  const { data: submissions, isLoading: submissionsLoading } = useQuery({
+    queryKey: ["submissions", selectedAssignment],
+    queryFn: async () => {
+      const { data } = await api.get(
+        `/grade/submissions/${selectedAssignment}`
+      );
+      return data;
+    },
+  });
 
   return studentsLoading || assignmentsLoading ? (
     <AppLayout
@@ -110,8 +121,16 @@ export const Upload = () => {
       />
       <SideSheet
         heading={"Select Student"}
-        content={<StudentSheet students={students} />}
+        content={<StudentSheet students={students} submissions={submissions}/>}
         open={isOpen}
+      >
+        <></>
+      </SideSheet>
+      <SideSheet
+        heading={"Grade Results"}
+        content={<FeedbackSheet />}
+        open={feedbackOpen}
+        override={true}
       >
         <></>
       </SideSheet>

@@ -1,4 +1,11 @@
-import { Bell, BookCheck, MoreVertical, Plus, PlusCircle } from "lucide-react";
+import {
+  Bell,
+  BookCheck,
+  CheckCircle,
+  MoreVertical,
+  Plus,
+  PlusCircle,
+} from "lucide-react";
 import { AppLayout } from "../components/ui/AppLayout";
 import { ContentScrollable } from "../components/ui/ContentScrollable";
 import { SideNav } from "../components/ui/SideNav";
@@ -9,6 +16,8 @@ import { useState } from "react";
 import { RubricTable } from "../components/rubric/RubricTable";
 import { Dialog } from "../components/ui/Dialog";
 import { HeadNav } from "@/components/ui/HeadNav";
+import { DashboardTable } from "@/components/dashboard/DashboardTable";
+import { MetricsCard } from "@/components/dashboard/MetricsCard";
 // import { Drawer } from "../components/ui/Drawer";
 
 export const Dashboard = () => {
@@ -23,27 +32,41 @@ export const Dashboard = () => {
           <ContentScrollable
             nav1={<HeadNav title={"Dashboard"} />}
             content={
-              <div className="w-full bg-white h-full">
-                <SplitPane split="vertical" sizes={sizes} onChange={setSizes}>
-                  <Pane minSize={"70%"} maxSize={"60%"} className="">
-                    <div className="w-full h-full">
-                      {/* <button
-                        className="btn"
-                        onClick={() =>
-                          document.getElementById("my_modal_3").showModal()
-                        }
-                      >
-                        open modal
-                      </button> */}
+              <div className="w-full bg-white h-full px-4 py-8">
+                <div className="w-full h-full">
+                  <div className="flex items-center space-x-10 mx-auto">
+                    <MetricsCard
+                      color={"#d1dae1"}
+                      icon={<CheckCircle className="opacity-60" />}
+                      title={"Assignments"}
+                      //  sub ={}
+                      value={24}
+                    />
+                    <MetricsCard
+                      color={"red"}
+                      icon={<CheckCircle className="opacity-60" />}
+                      title={"Enrolled Students"}
+                      //  sub ={}
+                      value={24}
+                    />
 
-                      <Dialog content={<RubricTable />} />
-                      {/* <RubricTable/> */}
-                    </div>
-                  </Pane>
-                  <Pane>
-                    <div className="w-full h-full"></div>
-                  </Pane>
-                </SplitPane>
+                    <MetricsCard
+                      color={"red"}
+                      icon={<CheckCircle className="opacity-60" />}
+                      title={"Batch Grading"}
+                      //  sub ={}
+                      value={24}
+                    />
+                    <MetricsCard
+                      color={"red"}
+                      icon={<CheckCircle className="opacity-60" />}
+                      title={"Submissions"}
+                      //  sub ={}
+                      value={24}
+                    />
+                  </div>
+                  <DashboardTable />
+                </div>
               </div>
             }
           />

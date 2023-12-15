@@ -34,17 +34,24 @@ export const UploadAssignment = ({
     selectedAssignment,
     selectedStudent,
     updateIsOpen,
+    feedback,
+    updateFeedback,
+    updateFeedbackOpen,
+    updateSelectedStudent,
   } = useUploadStore();
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      const { data } = await api.post("/submission/", {
-        assignment: selectedAssignment,
-        student: selectedStudent,
-        file: file,
-      });
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("assignmentId", selectedAssignment);
+      formData.append("studentId", selectedStudent.id);
+      formData.append("fileExtension", file?.name.split(".").pop());
+      const { data } = await api.post("/grade/submit", formData);
+      return data;
     },
     onSuccess: data => {
+      updateIsOpen(true);
       toast("Submission Successfully Uploaded", {
         icon: <Info />,
       });
@@ -64,13 +71,19 @@ export const UploadAssignment = ({
       formData.append("studentId", selectedStudent.id);
       formData.append("fileExtension", file?.name.split(".").pop());
       const { data } = await api.post("/grade/", formData);
+      return data;
     },
     onSuccess: data => {
       toast("Submission Graded", {
         icon: <Info />,
       });
+      console.log(data);
+      const feedback = JSON.parse(data.feedback);
+      updateFeedback({ ...feedback, gradedAt: data.gradedAt });
+      updateFeedbackOpen(true);
+      updateSelectedStudent(null);
     },
-    onError: data => {
+    onError: () => {
       toast("Error Grading Submission", {
         icon: <Info />,
       });
@@ -147,6 +160,7 @@ export const UploadAssignment = ({
             </span>
           </div>
           <Select
+            styles={{ fontSize: "5px" }}
             isDisabled={selectedAssignment || selectedStudent ? true : false}
             onChange={({ value, label }) => {
               console.log(value);
@@ -181,6 +195,7 @@ export const UploadAssignment = ({
             onClick={() => {
               if (
                 !selectedAssignment ||
+                !file ||
                 submitMutation.isLoading ||
                 gradeNowMutation.isLoading
               ) {
@@ -209,6 +224,7 @@ export const UploadAssignment = ({
             onClick={() => {
               if (
                 !selectedAssignment ||
+                !file ||
                 submitMutation.isLoading ||
                 gradeNowMutation.isLoading
               ) {

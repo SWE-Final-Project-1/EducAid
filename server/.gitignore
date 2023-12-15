@@ -36,7 +36,7 @@ deactivate/
 .ipynb_checkpoints/
 
 # Environment configuration
-.env
+# .env
 deativate
 
 # Python local package

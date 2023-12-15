@@ -1,7 +1,12 @@
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 
-export const AssignmentDetailed = ({ assignment, isLoading }) => {
+export const AssignmentDetailed = ({
+  assignment,
+  isLoading,
+  students,
+  submissions,
+}) => {
   return !isLoading ? (
     <>
       <div className="h-full py-2 space-y-2 transition-opacity duration-500 ease-linear">
@@ -25,14 +30,15 @@ export const AssignmentDetailed = ({ assignment, isLoading }) => {
           <span>
             {" "}
             <span className="font-logo">Submissions: </span>
-            20/27
+            {students && submissions
+              ? submissions?.length + "/" + students?.length
+              : "-"}
             {/* {assignment?.points} */}
           </span>
-          {/* <span>
+          <span>
             {" "}
-            <span className="font-logo">Submitting: </span>{" "}
-            {assignment?.submissionFormats?.join(", ")}
-          </span> */}
+            <span className="font-logo">Type: </span> {assignment?.type}
+          </span>
 
           {/* <span>
             {" "}
