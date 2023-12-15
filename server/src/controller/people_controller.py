@@ -33,16 +33,17 @@ def retrieve_students():
 def retrieve_dashboard_stats():
     try:
         # Retrieve total counts
-        assignments_count = len(db.collection('assignments').get())
-        submissions_count = len(db.collection('submissions').get())
-        students_count = len(db.collection('students').get())
-        notifications_count = len(db.collection('notifications').get())
+        instructor_id = session.get("user").get("id")
+        assignments_count = len(db.collection('assignments').where("instructorId", "==", instructor_id).get())
+        submissions_count = len(db.collection('submissions').where("instructorId", "==", instructor_id).get())
+        students_count = len(db.collection('students').where("instructorId", "==", instructor_id).get())
+        notifications_count = len(db.collection('notifications').where("instructorId", "==", instructor_id).get())
 
         previous_counts = {
-            'assignments': 100,  # Replace with your actual previous count
-            'submissions': 80,   # Replace with your actual previous count
-            'students': 200,     # Replace with your actual previous count
-            'notifications': 50  # Replace with your actual previous count
+            'assignments': 3,  # Replace with your actual previous count
+            'submissions': 2,   # Replace with your actual previous count
+            'students': 3,     # Replace with your actual previous count
+            'notifications': 4# Replace with your actual previous count
         }
 
         def calculate_percentage_increase(current, previous):
@@ -69,7 +70,7 @@ def retrieve_dashboard_stats():
 
     except Exception as e:
         print(f"Error fetching metrics: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
+        return {'error': 'Internal server error'}, 500
 
 @people.route("/", methods=["POST"])
 def create_student():
