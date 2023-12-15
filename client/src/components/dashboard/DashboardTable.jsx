@@ -1,3 +1,5 @@
+import { CheckSquare } from "lucide-react";
+import { Checkbox } from "../ui/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -8,26 +10,47 @@ import {
   TableRow,
 } from "../ui/ui/table";
 
-export const DashboardTable = () => {
+export const DashboardTable = ({ students }) => {
+  //   const hasSubmitted = studentId => {
+  //     return submissions?.some(s => s.studentId === studentId);
+  //   };
   return (
-    <div className="w-full">
-      <Table className="w-full">
+    <div className=" border rounded-md">
+      <Table className="w-full ">
         <TableCaption>All students Enrolled</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Firstname</TableHead>
+        <TableHeader className="w-full bg-app_white">
+          <TableRow className="w-full bg-app_white">
+            <TableHead>
+              <CheckSquare size={15} />
+            </TableHead>
+            <TableHead>Firstname</TableHead>
             <TableHead>Lastname</TableHead>
             <TableHead>Age</TableHead>
             <TableHead className="text-right">Gender</TableHead>
+            <TableHead className="text-right">Avg Score</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
-          <TableRow>
-            <TableCell className="font-medium">INV001</TableCell>
-            <TableCell>Paid</TableCell>
-            <TableCell>Credit Card</TableCell>
-            <TableCell className="text-right">$250.00</TableCell>
-          </TableRow>
+          {students?.map(s => (
+            <TableRow key={s.id}>
+              <TableCell>
+                <Checkbox
+                  //   checked={hasSubmitted(s.id)}
+                  onCheckedChange={() => {
+                    // if (hasSubmitted(s.id)) return;
+                    // toggleIsOpen();
+                    // updateSelectedStudent(s);
+                  }}
+                />
+              </TableCell>
+              <TableCell className="font-medium">{s.firstName}</TableCell>
+              <TableCell>{s.lastName}</TableCell>
+              <TableCell>{s.age}</TableCell>
+              <TableCell className="text-right">{s.gender}</TableCell>
+              <TableCell className="text-right">67</TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </div>
